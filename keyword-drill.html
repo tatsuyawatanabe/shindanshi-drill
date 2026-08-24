@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>課題→対応策キーワード変換ドリル</title>
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+ :root{
+ --paper:#F5EFE1;
+ --paper-dark:#EDE4CE;
+ --line:#CFC3A3;
+ --ink:#26314A;
+ --ink-soft:#5B5747;
+ --accent:#7A4B3A;
+ --moss:#4B6B4E;
+ --gold:#B08A3E;
+ --card-shadow: 0 1px 0 rgba(38,49,74,0.06);
+ }
+
+ *{box-sizing:border-box;}
+ html,body{margin:0;padding:0;}
+ body{
+ background:
+ repeating-linear-gradient(180deg, transparent, transparent 27px, var(--line) 28px),
+ var(--paper);
+ color:var(--ink);
+ font-family:'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+ min-height:100vh;
+ padding:18px 14px 60px;
+ }
+
+ .wrap{max-width:480px; margin:0 auto;}
+
+ header{ text-align:center; padding:6px 0 14px; }
+ .eyebrow{
+ font-family:'Space Mono', monospace;
+ font-size:11px; letter-spacing:.18em; color:var(--gold); text-transform:uppercase;
+ }
+ h1{
+ font-family:'Shippori Mincho', serif; font-weight:700; font-size:23px;
+ margin:4px 0 2px; color:var(--ink);
+ }
+ .sub{ font-size:12.5px; color:var(--ink-soft); }
+
+ .tape{
+ margin-top:14px; background:#FBF8EF; border:1px solid var(--line); border-radius:2px;
+ padding:10px 12px; font-family:'Space Mono', monospace; font-size:13px;
+ color:var(--ink-soft); position:relative; box-shadow: var(--card-shadow);
+ }
+ .tape::before, .tape::after{
+ content:""; position:absolute; left:0; right:0; height:6px;
+ background-image: linear-gradient(45deg, var(--paper) 50%, transparent 50%), linear-gradient(-45deg, var(--paper) 50%, transparent 50%);
+ background-size: 10px 6px; background-repeat:repeat-x;
+ }
+ .tape::before{ top:-6px; background-position: 0 6px;}
+ .tape::after{ bottom:-6px; transform:rotate(180deg);}
+ .tape-row{display:flex; justify-content:space-between; align-items:center;}
+ .tape-marks{letter-spacing:3px; font-size:15px;}
+ .tape-marks .ok{color:var(--moss);}
+ .tape-marks .ng{color:#A23B2E;}
+ .tape-rate{font-weight:700; color:var(--ink);}
+
+ .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 10px; }
+ .tab{
+ font-size:12.5px; padding:6px 10px; border:1px solid var(--line);
+ background:var(--paper-dark); color:var(--ink-soft); border-radius:3px;
+ cursor:pointer; user-select:none; transition:all .15s ease;
+ }
+ .tab.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+ .tab .cnt{opacity:.65; font-size:10.5px; margin-left:2px;}
+
+ .session-row{display:flex; gap:8px; margin:6px 0 18px;}
+ .sbtn{
+ flex:1; font-family:'Space Mono', monospace; font-size:13px; padding:10px 4px;
+ text-align:center; background:var(--paper); border:1px solid var(--ink); color:var(--ink);
+ border-radius:3px; cursor:pointer;
+ }
+ .sbtn:active{ background:var(--ink); color:var(--paper); }
+ .sbtn b{display:block; font-size:16px;}
+ .sbtn span{font-size:9.5px; color:var(--ink-soft); font-family:'Zen Kaku Gothic New',sans-serif;}
+
+ .stage{ min-height:360px; }
+ .card{
+ background:#FBF8EF; border:1px solid var(--line); border-radius:4px;
+ padding:22px 20px 18px; box-shadow: var(--card-shadow); position:relative;
+ }
+ .card-top{
+ display:flex; justify-content:space-between; align-items:center;
+ font-family:'Space Mono', monospace; font-size:11px; color:var(--gold);
+ letter-spacing:.06em; margin-bottom:14px;
+ }
+ .progress{ font-size:11px; color:var(--ink-soft); }
+ .qlabel{ font-family:'Space Mono', monospace; font-size:11px; color:var(--ink-soft); margin-bottom:6px; }
+ .qtext{
+ font-family:'Shippori Mincho', serif; font-size:17px; line-height:1.7;
+ color:var(--ink); min-height:70px;
+ }
+ .divider{ border:none; border-top:1px dashed var(--line); margin:16px 0; }
+ .answer{ display:none; }
+ .answer.show{ display:block; }
+ .alabel{ font-family:'Space Mono', monospace; font-size:11px; color:var(--accent); margin-bottom:8px; }
+ .kw-block{
+ background:var(--paper-dark); border-left:3px solid var(--accent); padding:10px 12px;
+ border-radius:2px; margin-bottom:8px;
+ }
+ .kw-block .tag{ font-size:10.5px; color:var(--ink-soft); margin-bottom:3px; }
+ .kw-block .val{ font-size:15px; color:var(--ink); font-weight:700; }
+ .why-block{
+ background:var(--paper-dark); border-left:3px solid var(--moss); padding:10px 12px;
+ border-radius:2px;
+ }
+ .why-block .tag{ font-size:10.5px; color:var(--ink-soft); margin-bottom:3px; }
+ .why-block .val{ font-size:14px; color:var(--ink); line-height:1.6; }
+
+ .reveal-btn{
+ width:100%; margin-top:16px; background:var(--ink); color:var(--paper);
+ border:none; border-radius:3px; padding:13px; font-size:14px; font-weight:700;
+ font-family:'Zen Kaku Gothic New', sans-serif; cursor:pointer;
+ }
+ .judge-row{ display:flex; gap:10px; margin-top:14px; }
+ .jbtn{
+ flex:1; padding:12px; border-radius:3px; border:1px solid var(--line);
+ font-size:14px; font-weight:700; cursor:pointer;
+ font-family:'Zen Kaku Gothic New', sans-serif; background:var(--paper);
+ }
+ .jbtn.ok{ color:var(--moss); border-color:var(--moss); }
+ .jbtn.ng{ color:#A23B2E; border-color:#A23B2E; }
+ .jbtn.ok:active{ background:var(--moss); color:#fff; }
+ .jbtn.ng:active{ background:#A23B2E; color:#fff; }
+
+ .done-card{ text-align:center; padding:36px 20px; }
+ .done-card .big{ font-family:'Space Mono', monospace; font-size:34px; font-weight:700; color:var(--ink); }
+ .done-card p{ color:var(--ink-soft); font-size:13px; margin-top:6px;}
+ .restart{
+ margin-top:18px; width:100%; background:var(--paper); border:1px solid var(--ink); color:var(--ink);
+ padding:12px; border-radius:3px; font-weight:700; cursor:pointer;
+ font-family:'Zen Kaku Gothic New', sans-serif;
+ }
+
+ .weak-box{
+ margin-top:22px; background:var(--paper-dark); border:1px solid var(--line);
+ border-radius:4px; padding:14px 16px;
+ }
+ .weak-box h2{ font-family:'Shippori Mincho', serif; font-size:14px; margin:0 0 8px; }
+ .weak-item{
+ display:flex; justify-content:space-between; font-size:12px;
+ padding:5px 0; border-bottom:1px dotted var(--line); color:var(--ink-soft);
+ }
+ .weak-item:last-child{border-bottom:none;}
+ .weak-item b{color:#A23B2E;}
+
+ .opt-row{ margin:2px 0 12px; }
+ .opt-toggle{
+ display:flex; align-items:center; gap:8px;
+ font-size:12.5px; color:var(--ink-soft); cursor:pointer; user-select:none;
+ }
+ .opt-toggle input{ accent-color:var(--ink); width:15px; height:15px; }
+
+ .sync-box{
+ margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+ display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+ }
+ .sync-btn{
+ font-family:'Zen Kaku Gothic New', sans-serif; font-size:11.5px;
+ padding:7px 10px; background:var(--paper); border:1px solid var(--line);
+ color:var(--ink-soft); border-radius:3px; cursor:pointer;
+ }
+ .sync-btn:active{ background:var(--paper-dark); }
+ .sync-area{
+ width:100%; margin-top:2px; font-family:'Space Mono', monospace; font-size:10.5px;
+ padding:8px; border:1px solid var(--line); border-radius:3px; background:#FBF8EF; color:var(--ink);
+ resize:vertical;
+ }
+ .sync-msg{ font-size:11px; color:var(--moss); }
+
+ footer{
+ text-align:center; margin-top:26px; font-size:10.5px; color:var(--ink-soft);
+ font-family:'Space Mono', monospace;
+ }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+ <header>
+ <div class="eyebrow">KEYWORD MAPPING DRILL</div>
+ <h1>課題→対応策キーワード変換</h1>
+ <div class="sub">与件文の状況を見て、飛躍せず想定できる対応策を思い出す練習。</div>
+ </header>
+
+ <div class="tape">
+ <div class="tape-row">
+ <span id="tapeMarks" class="tape-marks">まだ記録がありません</span>
+ <span id="tapeRate" class="tape-rate">--%</span>
+ </div>
+ </div>
+
+ <div class="tabs" id="tabs"></div>
+
+ <div class="opt-row">
+ <label class="opt-toggle"><input type="checkbox" id="weakOnlyToggle"> 苦手優先モード（習得済み[連続2回正解]の問題を除外）</label>
+ </div>
+
+ <div class="session-row">
+ <div class="sbtn" data-n="5"><b>5問</b><span>約3分</span></div>
+ <div class="sbtn" data-n="10"><b>10問</b><span>約5〜7分</span></div>
+ <div class="sbtn" data-n="99"><b>全問</b><span>事例集中</span></div>
+ </div>
+
+ <div class="stage" id="stage"></div>
+
+ <div class="weak-box" id="weakBox" style="display:none;">
+ <h2>苦手リスト（正答率が低い順）</h2>
+ <div id="weakList"></div>
+ </div>
+
+ <div class="sync-box">
+ <button class="sync-btn" id="exportBtn">📤 進捗をエクスポート</button>
+ <button class="sync-btn" id="importBtn">📥 進捗をインポート</button>
+ <textarea class="sync-area" id="syncArea" style="display:none;" rows="3" placeholder="ここに進捗JSONを貼り付けて「読み込む」を押す"></textarea>
+ <button class="sync-btn" id="syncApplyBtn" style="display:none;">読み込む</button>
+ <span class="sync-msg" id="syncMsg"></span>
+ </div>
+
+ <footer>与件文の状況→対応策の対応関係トレーニング用オリジナル例文 &middot; 記録は端末(localStorage)に保存されます。新しいバージョンをもらったら「進捗をエクスポート」→次のバージョンで「進捗をインポート」で引き継げます。</footer>
+</div>
+
+<script>
+// ---------------- Question bank ----------------
+const BANK = [
+ // 事例Ⅰ 組織・人事
+ {cat:'j1', sit:'ベテラン職人の技術が言語化されておらず、指導は現場でのOJTのみに頼っている。', kw:'技術のマニュアル化・形式知化＋複数人によるOJT体制の構築', why:'属人化した技術を仕組み化することで、特定の個人に依存しない体制になり、技術習得のスピードも上がる。'},
+ {cat:'j1', sit:'意思決定が社長1人に集中しており、現場の判断だけでは対応できないことが多い。', kw:'権限委譲（判断基準・権限範囲を明確にした上で）', why:'現場のスピード感が上がり、社長の負担も軽減される。ただし判断基準が曖昧なまま任せると混乱するので、範囲の明確化とセットで書く。'},
+ {cat:'j1', sit:'部門ごとに情報が閉じており、他部門の状況が共有されていない。', kw:'部門横断のプロジェクトチーム編成／定期的な情報共有の場の設置', why:'部門間の連携不足による非効率・重複を解消し、全社最適の視点を持てるようになる。'},
+ {cat:'j1', sit:'評価基準が曖昧で、従業員の間で不公平感がある。', kw:'評価基準の明確化・見える化（成果指標の設定）', why:'納得感のある評価により、モチベーション低下や離職を防げる。'},
+ {cat:'j1', sit:'若手社員の定着率が低く、数年で離職してしまう。', kw:'キャリアパスの明示＋教育制度の整備＋評価と処遇の連動', why:'成長実感と将来展望を持てるようにすることで、定着率の向上につながる。'},
+ {cat:'j1', sit:'M&Aにより、買収前の企業文化を持つ従業員が既存社員と馴染めていない。', kw:'合同研修・混成チームでの協働機会の創出による相互理解の促進', why:'文化の違いを急に統一しようとせず、接点を増やして段階的にすり合わせることで摩擦を減らせる。'},
+ {cat:'j1', sit:'新規事業への配置転換に、既存事業の従業員が強い抵抗を示している。', kw:'既存スキルを新事業でどう活かせるかの提示＋教育体制の整備＋処遇維持の周知', why:'不安の中身（スキルが活かせるか／ついていけるか／待遇が変わるか）に1つずつ答えることで抵抗を和らげられる。'},
+ {cat:'j1', sit:'成果主義を導入したところ、従業員同士の協力関係が薄れてしまった。', kw:'個人評価とチーム・部門単位の評価を組み合わせた評価制度への見直し', why:'行き過ぎた成果主義の副作用（協調性の低下）を、集団単位の指標を加えることで緩和できる。'},
+ {cat:'j1', sit:'後継者候補はいるが、経営理念やおもてなし・技術などのノウハウが、先代・現経営者個人の中に留まっており、明文化されていない。', kw:'経営理念やノウハウの言語化・マニュアル化による形式知化', why:'属人的な暗黙知のままでは、後継者や従業員が正確に引き継げない。言語化することで、承継後も伝統や強みを再現しやすくなる。'},
+ {cat:'j1', sit:'新規事業に成果報酬型(歩合給)を導入したところ、既存事業の年功的な技能給の社員から不公平感の声が上がり、部門間の連携も薄い。', kw:'賃金体系間の格差是正(基本給の比重を高める)＋部門横断のプロジェクト単位での共同評価制度の導入', why:'賃金差の是正だけでは不満は消えても連携までは生まれない。共通の評価軸(プロジェクト単位の成果)を加えることで、異なる賃金体系の社員同士の協働意識も同時に高められる。'},
+ {cat:'j1', sit:'機能別組織から事業部制へ移行する場面。独立性が高まる分、事業部間の連携・一体感が薄れるリスクがある。', kw:'合同研修・人事異動(ローテーション)による部門間交流の促進で一体感を補完する', why:'事業部制は意思決定スピードと専門性を高める一方、セクショナリズム(部門間の壁)という副作用を生みやすい。組織変更の施策とセットでその副作用を打ち消す一手を書くと多面的な解答になる。'},
+
+ // 事例Ⅱ マーケティング・流通
+ {cat:'j2', sit:'看板商品が毎日午前中に完売し、午後の来店客が購入できずに帰っている。', kw:'予約・取り置きサービスの導入（電話・LINE等での事前受付）', why:'増産せずに機会損失を防ぐことができ、無理のない範囲で顧客満足度を高められる。'},
+ {cat:'j2', sit:'決まった曜日に定期的に購入する常連客が自然発生的に増えている。', kw:'定期購入（サブスクリプション）サービスの導入', why:'需要を事前に把握できるようになり、生産計画が立てやすくなる。顧客との継続的な関係も築ける。'},
+ {cat:'j2', sit:'商店街の来街者数が減少し、郊外の大型店に若い世代の顧客が流出している。', kw:'SNSでの情報発信＋ECサイトでの販路拡大（若年層向けの接点づくり）', why:'実店舗の商圏に縛られない顧客接点を作ることで、若年層の取り込みと既存客の維持を両立できる。'},
+ {cat:'j2', sit:'一見客が中心で、リピーターの獲得ができていない。', kw:'会員制度・ポイントカードの導入によるCRM（顧客関係管理）強化', why:'購買履歴や来店頻度を把握し、個別対応や再来店の促進につなげられる。'},
+ {cat:'j2', sit:'高齢化が進む既存顧客層に売上を依存しており、将来的な先細りが懸念される。', kw:'新規顧客層（若年層・ファミリー層等）向けの新商品開発・情報発信', why:'既存客との関係を維持しながら、将来の顧客基盤を広げることで持続可能性を高める。'},
+ {cat:'j2', sit:'専門的な品揃えと業者向けの雰囲気から、一般客が入店をためらっている。', kw:'初心者向けコーナーの新設・POPやスタッフによる声かけなど、入店しやすい売場づくり', why:'心理的なハードルを下げることで、専門性の高さを維持したまま新規客の来店を促せる。'},
+ {cat:'j2', sit:'商品単価が低く、客単価が伸び悩んでいる。', kw:'高付加価値商品（プレミアムライン等）の開発・関連商品のセット販売', why:'既存客の客単価を引き上げることで、来店数を増やさなくても売上を伸ばせる。'},
+ {cat:'j2', sit:'季節による売上変動が大きく、閑散期の売上が不安定である。', kw:'閑散期向けの新商品・イベント企画の投入、通年で楽しめる商品ラインの拡充', why:'特定の季節に依存しない収益構造を作ることで、経営の安定性を高められる。'},
+ {cat:'j2', sit:'職人が製造工程やこだわりを語ることを好み、地元の学校の社会科見学などで説明を行い好評を得ているが、一般客向けには特に活用されていない。', kw:'既存の強み（説明・実演のノウハウ）を活かした見学ツアーや体験イベントの企画', why:'新たに何かを一から作るのではなく、社内にすでにある資産（語れる人材・コンテンツ）を新しい顧客層向けに転用することで、低コストかつ説得力のある施策になる。'},
+ {cat:'j2', sit:'大手やチェーン店との価格競争に巻き込まれ、値下げによる利益悪化に陥っている（安売りを避けたい場面）。', kw:'価格ではなく「製品・サービスの質（高付加価値化）」と「顧客との関係性強化」の2方向で差別化する', why:'価格での差別化は結局さらなる安売り競争を招くので、事例Ⅱの安売り回避は「質」と「関係性」で書くのが定石。関係性を深めればスイッチングも防げる。※「価格の差別化」と書きたくなるが罠。'},
+ {cat:'j2', sit:'地域資源の活用を問われたが、資源をただ紹介するだけで自社の強みと結びつけられていない。', kw:'地域資源（地元の食材・伝統技術・歴史・観光資源）×自社の強み（製品・ブランド・技術）を掛け合わせ、情報発信して認知度・ブランド向上につなげる', why:'地域資源は単独で挙げるのではなく、自社の強みと"結びつける"のがキモ。掛け算にして発信・ブランド向上まで書くと加点される。'},
+ {cat:'j2', sit:'顧客生涯価値（LTV）を高めたいと問われた（購入単価と頻度だけ書いて要素を1つ落としがちな場面）。', kw:'LTV＝購入単価×購入頻度×継続期間の3要素で考える。特に「継続期間」は会員制度・関係性強化でリピート／解約防止し、長く取引してもらう', why:'単価アップ・頻度アップは思いつくが、LTVの主役は「継続期間（関係性で長く）」。ここを落とすと事例Ⅱらしさが出ない。3要素セットで押さえる。'},
+ {cat:'j2', sit:'SNS（Instagram等）を活用した施策を助言する（「頻繁に発信する」で止めてしまいがちな場面）。', kw:'一方的な発信で終わらせず「双方向」にする。コメント・DM・投稿キャンペーン（UGC／ハッシュタグ）で顧客の反応を集め、口コミ拡散・商品改善につなげる', why:'事例Ⅱのデジタル施策は「発信するだけ」だと弱い。顧客を巻き込み反応を拾って"双方向"にすると加点される。発信→反応収集→口コミ拡散のループで書く。'},
+ {cat:'j2', sit:'常連客との関係強化を助言する（会員制度で「個別提案→客単価アップ」だけ書いて終わりがちな場面）。', kw:'会員制度で好み・購買履歴を管理し個別提案（単価UP）に加え、誕生日特典・新作優先案内でリピート促進（頻度UP）、試食会・ファンイベントでコミュニティ化（関係性深化・愛顧向上）まで書く', why:'関係強化を「単価UP」1軸で終わらせがち。単価だけでなく頻度・継続・コミュニティ化まで広げると、LTVの多軸をカバーできて厚い解答になる。'},
+ {cat:'j2', sit:'新規顧客層の開拓施策を助言する際、効果を「認知向上」「売上増加」だけで締めてしまいがちな場面。', kw:'「固定客化」「関係性構築」まで一段掘り下げて着地させる（事例Ⅱの定番の効果ワード）', why:'単発の来店・購入で終わらせず、継続的な関係につなげてこそ事例Ⅱらしい解答になる。ふぞろい採点でも「固定客化」等のワードは加点対象になりやすい。'},
+
+ // 事例Ⅲ 生産・技術
+ {cat:'j3', sit:'生産計画が熟練職人の勘に基づいて属人的に立てられている。', kw:'生産計画のデータベース化・標準化（DB化して属人性を排除）', why:'特定の担当者に依存しない体制になり、計画の精度と再現性が上がる。'},
+ {cat:'j3', sit:'若手作業者が担当できる工程が限定されており、繁忙工程に人員を柔軟に振り分けられない。', kw:'作業手順書の整備によるOJTの体系化＋多能工化の推進', why:'需要変動や欠員に柔軟に対応できる生産体制になり、特定工程のボトルネックを緩和できる。'},
+ {cat:'j3', sit:'段取り替えに時間がかかり、小ロット多品種生産の生産性を圧迫している。', kw:'段取り替え作業の標準化・外段取り化（機械停止前に準備できる作業を分離する）', why:'段取り替えの時間短縮により、小ロット化・多品種化に対応しやすくなる。'},
+ {cat:'j3', sit:'出荷前検査を熟練検査員の目視のみに頼っており、検査工程が生産全体のボトルネックになっている。', kw:'自動検査装置・画像測定機の導入による検査の省力化', why:'検査精度を維持・向上させながら処理能力を拡大でき、リードタイムの短縮にもつながる。'},
+ {cat:'j3', sit:'受注情報や仕様変更が部門間で口頭伝達に頼っており、伝達漏れが生じている。', kw:'ITシステム導入による情報の一元管理・共有', why:'伝達ミスや対応漏れを防ぎ、部門間の連携スピードを高められる。'},
+ {cat:'j3', sit:'見込み生産のため、過剰在庫と欠品が同時に発生している。', kw:'需要予測の精度向上、または受注生産・見込生産の比率見直し', why:'在庫水準を適正化し、保管コストの削減と欠品による機会損失の防止を両立できる。'},
+ {cat:'j3', sit:'得意先から、従来より短納期かつ小ロット多品種の注文が増加している。', kw:'工程順序の見直し・生産の平準化＋多能工化による柔軟な生産体制の構築', why:'需要の変化（小ロット多品種・短納期）に対応できる生産体制を作ることで、受注機会を逃さずに済む。'},
+ {cat:'j3', sit:'新製品の企画・開発から量産までのリードタイムが長く、市場投入の機会を逃している。', kw:'設計・製造部門の連携強化（コンカレントエンジニアリング）', why:'開発と生産準備を並行して進めることで、量産開始までの期間を短縮できる。'},
+ {cat:'j3', sit:'多品種化により、担当者ごとに味付けや加工方法にばらつきが生じている（複数の対応策を書く際、標準化・マニュアル化ばかりを言い換えて重複して挙げてしまいがちな場面）。', kw:'標準化（手順書化）に加えて、教育体制の整備・出荷前検査体制・多能工化など、異なる切り口を組み合わせる', why:'「経験と勘の形式知化」と「マニュアル化」は実質同じ論点（暗黙知の明文化）。2つ書いても多面性は評価されにくいので、標準化・教育・検査・体制という異なる切り口を意識的に組み合わせる。'},
+ {cat:'j3', sit:'「生産計画」と「生産統制」の役割の違いを問われた（統制を品質管理と混同しがちな場面）。', kw:'生産計画＝何を・いつ・どれだけ作るかを"事前に決める"（手順計画・工数計画・日程計画）／生産統制＝計画通り進むよう"実行中に管理"する（進捗管理・現品管理・余力管理の3つ）', why:'生産統制を「不良削減・歩留まり（＝品質管理）」と混同しがち。統制は計画とのズレを追う仕事で、進捗・現品・余力が3本柱。計画＝事前に決める／統制＝進捗・現品・余力で追う、で暗記。'},
+ {cat:'j3', sit:'段取り替えに時間がかかり小ロット化に対応できない（内段取り／外段取りの"向き"を逆に覚えがちな場面）。', kw:'内段取りの「外段取り化」（機械を止めないとできない作業を、稼働させたまま準備できる形に移す）＋段取り作業の標準化・マニュアル化', why:'方向が肝。内段取り（機械停止が必要）→外段取り（稼働中に準備）へ移すのが短縮の本質。「外段取りの内段取り化」と逆に書くと機械停止が増えて逆効果になる。'},
+
+ // 事例Ⅳ 財務・会計
+ {cat:'j4', sit:'与件文に「主力製品の売上が伸び悩んでいる」とある。', kw:'収益性の指標（売上高総利益率・売上高営業利益率など）', why:'売上の伸び悩みは収益性の悪化に直結しやすいため、まず収益性の観点から確認する。'},
+ {cat:'j4', sit:'与件文に「工場設備が老朽化し稼働率が低下している」とある。', kw:'効率性の指標（有形固定資産回転率など）', why:'設備関連の記述は、資産をどれだけ効率的に売上へ結びつけられているかという効率性の問題に直結しやすい。'},
+ {cat:'j4', sit:'与件文に「借入金が増加し、支払利息の負担が重い」とある。', kw:'安全性の指標（負債比率・インタレスト・カバレッジ・レシオなど）', why:'借入への依存度の高さは、財務的な安全性のリスクを示す典型的なサイン。'},
+ {cat:'j4', sit:'ある事業の営業利益が赤字だが、共通固定費配賦前の利益（貢献利益）はプラスである。', kw:'共通固定費は継続してもやめても発生する以上、貢献利益がプラスなら事業は維持すべき', why:'配賦後の赤字だけで即座に撤退を判断すると、実際には会社に貢献している事業を誤って切り捨ててしまう。'},
+ {cat:'j4', sit:'新規設備投資により、既存設備の一部が不要になり売却を検討している。', kw:'売却収入と、簿価との差額（売却損益）に対する税効果を差額キャッシュフローに織り込む', why:'売却損益は税金の増減を通じてキャッシュフローに影響するため、単純な売却収入だけでは不十分。'},
+ {cat:'j4', sit:'与件文に「M&Aによる買収を検討している」とある。', kw:'WACC（加重平均資本コスト）を割引率として用いた企業価値評価、投資額は資産の総額（グロス）を使用', why:'M&Aの価値評価では、割引率の設定と投資額の定義（純額でなく総額）を誤ると、価値創造の有無の結論が逆転しうる。'},
+ {cat:'j4', sit:'与件文に「複数の製品の生産数量を、限られた設備能力の中で決定する」とある。', kw:'制約条件（時間・数量など）1単位あたりの限界利益が高い製品を優先する最適セールスミックス', why:'限られた資源をどう配分するかという意思決定では、単位あたりの効率（限界利益÷制約条件）で比較するのが原則。'},
+ {cat:'j4', sit:'与件文に「D社は、すでに市場調査を実施し、費用を支払った」とある。', kw:'その調査費用は埋没原価として、以降の投資判断（NPV計算）からは除外する', why:'すでに支払い済みで戻ってこない費用は、これからの意思決定に影響を与えるべきではない。'},
+ {cat:'j4', sit:'財務諸表を比較し「自己資本比率が低い」という結果を、「利益が少ないから」と説明してしまいがちな場面。', kw:'自己資本比率＝純資産÷総資産という資本構成(借入への依存度)の指標であり、当期の利益の多寡では決まらない。負債(借入)への依存度が高いことが直接の原因', why:'純資産が同水準でも負債が多ければ総資産が膨らみ比率は下がる。利益と比率を安易に結びつけると原因分析が的外れになるので、資本構成(負債依存度)の話として説明する。'},
+];
+
+const CAT_LABELS = { all:'全部', j1:'事例Ⅰ', j2:'事例Ⅱ', j3:'事例Ⅲ', j4:'事例Ⅳ' };
+
+// ---------------- State ----------------
+let currentCat = 'all';
+let session = [];
+let sIndex = 0;
+let sScore = 0;
+let stats = {};
+let weakOnly = false;
+
+const STORAGE_KEY = 'keyword-mapping-stats';
+const WEAKONLY_KEY = 'keyword-mapping-weakonly';
+
+const stage = document.getElementById('stage');
+const tabsEl = document.getElementById('tabs');
+const weakBox = document.getElementById('weakBox');
+const weakList = document.getElementById('weakList');
+
+function keyFor(item){ return item.cat + '|' + item.sit.slice(0,14); }
+
+function isMastered(item){
+ const s = stats[keyFor(item)];
+ return !!(s && s.total >= 2 && s.correct === s.total);
+}
+
+function loadStats(){
+ try{
+ const raw = localStorage.getItem(STORAGE_KEY);
+ if(raw){ stats = JSON.parse(raw); }
+ }catch(e){ stats = {}; }
+ try{ weakOnly = localStorage.getItem(WEAKONLY_KEY) === '1'; }catch(e){ weakOnly = false; }
+ renderTape();
+ renderWeak();
+}
+function saveStats(){
+ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stats)); }
+ catch(e){ /* storage unavailable, session-only fallback */ }
+}
+
+function renderTape(){
+ const entries = Object.values(stats);
+ if(entries.length === 0){
+ document.getElementById('tapeMarks').textContent = 'まだ記録がありません';
+ document.getElementById('tapeRate').textContent = '--%';
+ return;
+ }
+ let totalC=0, totalT=0;
+ entries.forEach(s=>{ totalC+=s.correct; totalT+=s.total; });
+ const rate = totalT? Math.round(totalC/totalT*100) : 0;
+ const log = (window.__drillLog || []).slice(-14);
+ const marks = log.map(x=> x ? '<span class="ok">○</span>' : '<span class="ng">✕</span>').join(' ');
+ document.getElementById('tapeMarks').innerHTML = marks || '記録あり・履歴は今回のセッションから表示';
+ document.getElementById('tapeRate').textContent = '累計正答率 ' + rate + '%';
+}
+
+function renderWeak(){
+ const arr = Object.entries(stats)
+ .filter(([k,s]) => s.total >= 2)
+ .map(([k,s]) => ({key:k, rate: s.correct/s.total, total:s.total, label:s.label||k}))
+ .sort((a,b)=> a.rate - b.rate)
+ .slice(0,5);
+ if(arr.length === 0){ weakBox.style.display='none'; return; }
+ weakBox.style.display='block';
+ weakList.innerHTML = arr.map(x=>`<div class="weak-item"><span>${x.label}</span><b>${Math.round(x.rate*100)}%</b></div>`).join('');
+}
+
+function renderTabs(){
+ const cats = ['all','j1','j2','j3','j4'];
+ tabsEl.innerHTML = cats.map(c=>{
+ const cnt = c==='all' ? BANK.length : BANK.filter(b=>b.cat===c).length;
+ return `<div class="tab ${c===currentCat?'active':''}" data-cat="${c}">${CAT_LABELS[c]}<span class="cnt">(${cnt})</span></div>`;
+ }).join('');
+ tabsEl.querySelectorAll('.tab').forEach(t=>{
+ t.addEventListener('click', ()=>{ currentCat = t.dataset.cat; renderTabs(); });
+ });
+}
+
+function shuffle(arr){
+ const a = arr.slice();
+ for(let i=a.length-1;i>0;i--){
+ const j = Math.floor(Math.random()*(i+1));
+ [a[i],a[j]] = [a[j],a[i]];
+ }
+ return a;
+}
+
+function startSession(n){
+ let pool = currentCat==='all' ? BANK : BANK.filter(b=>b.cat===currentCat);
+ if(weakOnly) pool = pool.filter(b=>!isMastered(b));
+ session = shuffle(pool).slice(0, Math.min(n, pool.length));
+ sIndex = 0; sScore = 0;
+ window.__drillLog = [];
+ renderCard();
+}
+
+function renderCard(){
+ if(sIndex >= session.length){ renderDone(); return; }
+ const item = session[sIndex];
+ stage.innerHTML = `
+ <div class="card">
+ <div class="card-top">
+ <span>${CAT_LABELS[item.cat]}</span>
+ <span class="progress">${sIndex+1} / ${session.length}</span>
+ </div>
+ <div class="qlabel">状況（与件文）</div>
+ <div class="qtext">${item.sit}</div>
+ <hr class="divider">
+ <div class="answer" id="ansBlock">
+ <div class="alabel">対応策キーワード</div>
+ <div class="kw-block">
+ <div class="tag">想定すべきキーワード</div>
+ <div class="val">${item.kw}</div>
+ </div>
+ <div class="why-block">
+ <div class="tag">なぜ効くか</div>
+ <div class="val">${item.why}</div>
+ </div>
+ </div>
+ <button class="reveal-btn" id="revealBtn">対応策を見る</button>
+ <div class="judge-row" id="judgeRow" style="display:none;">
+ <div class="jbtn ok" id="okBtn">○ 思いつけた</div>
+ <div class="jbtn ng" id="ngBtn">✕ 思いつけなかった</div>
+ </div>
+ </div>
+ `;
+ document.getElementById('revealBtn').addEventListener('click', ()=>{
+ document.getElementById('ansBlock').classList.add('show');
+ document.getElementById('revealBtn').style.display='none';
+ document.getElementById('judgeRow').style.display='flex';
+ });
+ document.getElementById('okBtn').addEventListener('click', ()=> judge(true));
+ document.getElementById('ngBtn').addEventListener('click', ()=> judge(false));
+}
+
+function judge(correct){
+ const item = session[sIndex];
+ const k = keyFor(item);
+ if(!stats[k]) stats[k] = {correct:0, total:0, label:'['+CAT_LABELS[item.cat]+']'+item.sit.slice(0,16)+'…'};
+ stats[k].total += 1;
+ if(correct){ stats[k].correct += 1; sScore += 1; }
+ window.__drillLog.push(correct);
+ saveStats();
+ renderTape();
+ sIndex += 1;
+ renderCard();
+}
+
+function renderDone(){
+ renderWeak();
+ stage.innerHTML = `
+ <div class="card done-card">
+ <div class="eyebrow" style="margin-bottom:10px;">SESSION COMPLETE</div>
+ <div class="big">${sScore} / ${session.length}</div>
+ <p>お疲れさまでした。また隙間時間にどうぞ。</p>
+ <button class="restart" id="restartBtn">もう一度（同じ条件で）</button>
+ </div>
+ `;
+ document.getElementById('restartBtn').addEventListener('click', ()=>{
+ const n = session.length;
+ startSession(n >= BANK.length ? 99 : n);
+ });
+}
+
+// ---------------- Init ----------------
+renderTabs();
+loadStats();
+stage.innerHTML = `
+ <div class="card done-card">
+ <div class="eyebrow" style="margin-bottom:10px;">READY</div>
+ <div style="font-family:'Shippori Mincho',serif; font-size:16px; margin:8px 0 4px;">事例を選んで、問題数を選択</div>
+ <p>状況を読んで、対応策キーワードと「なぜ効くか」を思い出せるか試します。</p>
+ </div>
+`;
+document.querySelectorAll('.sbtn').forEach(b=>{
+ b.addEventListener('click', ()=> startSession(parseInt(b.dataset.n,10)));
+});
+
+const weakOnlyToggle = document.getElementById('weakOnlyToggle');
+weakOnlyToggle.checked = weakOnly;
+weakOnlyToggle.addEventListener('change', ()=>{
+ weakOnly = weakOnlyToggle.checked;
+ try{ localStorage.setItem(WEAKONLY_KEY, weakOnly ? '1' : '0'); }catch(e){}
+});
+
+const syncArea = document.getElementById('syncArea');
+const syncApplyBtn = document.getElementById('syncApplyBtn');
+const syncMsg = document.getElementById('syncMsg');
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+ syncArea.value = JSON.stringify(stats);
+ syncArea.style.display = 'block';
+ syncApplyBtn.style.display = 'none';
+ syncArea.focus();
+ syncArea.select();
+ syncMsg.textContent = '';
+ if(navigator.clipboard && navigator.clipboard.writeText){
+ navigator.clipboard.writeText(syncArea.value)
+ .then(()=>{ syncMsg.textContent = 'コピーしました。新しいバージョンの「進捗をインポート」に貼り付けてください。'; })
+ .catch(()=>{ syncMsg.textContent = '下のテキストを選択してコピーしてください。'; });
+ }else{
+ syncMsg.textContent = '下のテキストを選択してコピーしてください。';
+ }
+});
+
+document.getElementById('importBtn').addEventListener('click', ()=>{
+ syncArea.value = '';
+ syncArea.style.display = 'block';
+ syncApplyBtn.style.display = 'inline-block';
+ syncArea.focus();
+ syncMsg.textContent = '';
+});
+
+syncApplyBtn.addEventListener('click', ()=>{
+ try{
+ const imported = JSON.parse(syncArea.value);
+ stats = Object.assign({}, stats, imported);
+ saveStats();
+ renderTape();
+ renderWeak();
+ syncMsg.textContent = '読み込みました（' + Object.keys(imported).length + '件）。';
+ }catch(e){
+ syncMsg.textContent = '読み込みに失敗しました。JSONの形式を確認してください。';
+ }
+});
+</script>
+</body>
+</html>

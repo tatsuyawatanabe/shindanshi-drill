@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>中小企業診断士2次試験ドリル</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --paper:#F5EFE1;
+    --paper-dark:#EDE4CE;
+    --line:#CFC3A3;
+    --ink:#26314A;
+    --ink-soft:#5B5747;
+    --red:#A23B2E;
+    --moss:#4B6B4E;
+    --gold:#B08A3E;
+    --card-shadow: 0 1px 0 rgba(38,49,74,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(180deg, transparent, transparent 27px, var(--line) 28px),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+    min-height:100vh;
+    padding:32px 16px 60px;
+  }
+
+  .wrap{max-width:560px; margin:0 auto;}
+
+  header{ text-align:center; padding:10px 0 28px; }
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    color:var(--gold);
+    text-transform:uppercase;
+  }
+  h1{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:28px;
+    margin:6px 0 4px;
+    color:var(--ink);
+    text-wrap:balance;
+  }
+  .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+
+  .deck{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  .card{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+    background:#FBF8EF;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:22px 22px 20px;
+    box-shadow: var(--card-shadow);
+    position:relative;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .card:active{ transform:translateY(1px); }
+
+  .card-top{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:'Space Mono', monospace;
+    font-size:11px; color:var(--gold);
+    letter-spacing:.06em;
+    margin-bottom:12px;
+  }
+  .card-top .count{ color:var(--ink-soft); }
+
+  .card h2{
+    font-family:'Shippori Mincho', serif;
+    font-size:21px;
+    font-weight:700;
+    margin:0 0 8px;
+    color:var(--ink);
+  }
+  .card p{
+    font-size:13.5px;
+    line-height:1.7;
+    color:var(--ink-soft);
+    margin:0 0 16px;
+  }
+
+  .card-foot{
+    display:flex; justify-content:space-between; align-items:center;
+    border-top:1px dashed var(--line);
+    padding-top:12px;
+  }
+  .tags{
+    display:flex; flex-wrap:wrap; gap:6px;
+  }
+  .tag{
+    font-size:10.5px;
+    padding:3px 8px;
+    background:var(--paper-dark);
+    color:var(--ink-soft);
+    border-radius:2px;
+  }
+  .go{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .go::after{ content:" →"; }
+
+  .accent-1{ border-left:3px solid var(--red); }
+  .accent-2{ border-left:3px solid var(--moss); }
+
+  footer{
+    text-align:center; margin-top:34px; font-size:10.5px; color:var(--ink-soft);
+    font-family:'Space Mono', monospace;
+    line-height:1.8;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Exam Prep</div>
+    <h1>中小企業診断士 2次試験ドリル</h1>
+    <div class="sub">スキマ時間の一問一答。ホーム画面に追加すればアプリっぽく使えます。</div>
+  </header>
+
+  <div class="deck">
+    <a class="card accent-1" href="case4-drill.html">
+      <div class="card-top"><span>CASE IV</span><span class="count">全79問</span></div>
+      <h2>事例Ⅳ 隙間時間ドリル</h2>
+      <p>財務・会計の公式と解法の型を一問一答で。経営分析からCVP、意思決定会計、企業価値評価まで。</p>
+      <div class="card-foot">
+        <div class="tags">
+          <span class="tag">経営分析</span>
+          <span class="tag">CVP</span>
+          <span class="tag">意思決定会計</span>
+          <span class="tag">WACC</span>
+        </div>
+        <span class="go">開く</span>
+      </div>
+    </a>
+
+    <a class="card accent-2" href="keyword-drill.html">
+      <div class="card-top"><span>KEYWORD MAPPING</span><span class="count">全46問</span></div>
+      <h2>課題→対応策キーワード変換</h2>
+      <p>与件文の「状況」を見て、飛躍せず想定できる対応策キーワードと、なぜ効くかを思い出す練習。</p>
+      <div class="card-foot">
+        <div class="tags">
+          <span class="tag">事例Ⅰ</span>
+          <span class="tag">事例Ⅱ</span>
+          <span class="tag">事例Ⅲ</span>
+          <span class="tag">事例Ⅳ</span>
+        </div>
+        <span class="go">開く</span>
+      </div>
+    </a>
+  </div>
+
+  <footer>正誤記録はブラウザ内(localStorage)に保存されます</footer>
+</div>
+</body>
+</html>

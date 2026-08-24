@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>事例Ⅳ 隙間時間ドリル</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --paper:#F5EFE1;
+    --paper-dark:#EDE4CE;
+    --line:#CFC3A3;
+    --ink:#26314A;
+    --ink-soft:#5B5747;
+    --red:#A23B2E;
+    --moss:#4B6B4E;
+    --gold:#B08A3E;
+    --card-shadow: 0 1px 0 rgba(38,49,74,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(180deg, transparent, transparent 27px, var(--line) 28px),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+    min-height:100vh;
+    padding:18px 14px 60px;
+  }
+
+  .wrap{max-width:480px; margin:0 auto;}
+
+  /* ---- Header / tape ---- */
+  header{
+    text-align:center;
+    padding:6px 0 14px;
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    color:var(--gold);
+    text-transform:uppercase;
+  }
+  h1{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:26px;
+    margin:4px 0 2px;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  .tape{
+    margin-top:14px;
+    background:#FBF8EF;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:10px 12px;
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    position:relative;
+    box-shadow: var(--card-shadow);
+  }
+  .tape::before, .tape::after{
+    content:"";
+    position:absolute; left:0; right:0; height:6px;
+    background-image: linear-gradient(45deg, var(--paper) 50%, transparent 50%), linear-gradient(-45deg, var(--paper) 50%, transparent 50%);
+    background-size: 10px 6px; background-repeat:repeat-x;
+  }
+  .tape::before{ top:-6px; background-position: 0 6px;}
+  .tape::after{ bottom:-6px; transform:rotate(180deg);}
+  .tape-row{display:flex; justify-content:space-between; align-items:center;}
+  .tape-marks{letter-spacing:3px; font-size:15px;}
+  .tape-marks .ok{color:var(--moss);}
+  .tape-marks .ng{color:var(--red);}
+  .tape-rate{font-weight:700; color:var(--ink);}
+
+  /* ---- Tabs ---- */
+  .tabs{
+    display:flex; flex-wrap:wrap; gap:6px;
+    margin:16px 0 10px;
+  }
+  .tab{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:12.5px;
+    padding:6px 10px;
+    border:1px solid var(--line);
+    background:var(--paper-dark);
+    color:var(--ink-soft);
+    border-radius:3px;
+    cursor:pointer;
+    user-select:none;
+    transition:all .15s ease;
+  }
+  .tab.active{
+    background:var(--ink);
+    color:var(--paper);
+    border-color:var(--ink);
+  }
+  .tab .cnt{opacity:.65; font-size:10.5px; margin-left:2px;}
+
+  /* ---- Session buttons ---- */
+  .session-row{display:flex; gap:8px; margin:6px 0 18px;}
+  .sbtn{
+    flex:1;
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    padding:10px 4px;
+    text-align:center;
+    background:var(--paper);
+    border:1px solid var(--ink);
+    color:var(--ink);
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .sbtn:active{ background:var(--ink); color:var(--paper); }
+  .sbtn b{display:block; font-size:16px;}
+  .sbtn span{font-size:9.5px; color:var(--ink-soft); font-family:'Zen Kaku Gothic New',sans-serif;}
+
+  /* ---- Card ---- */
+  .stage{ min-height:340px; }
+  .card{
+    background:#FBF8EF;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:22px 20px 18px;
+    box-shadow: var(--card-shadow);
+    position:relative;
+  }
+  .card-top{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Space Mono', monospace;
+    font-size:11px; color:var(--gold);
+    letter-spacing:.06em;
+    margin-bottom:14px;
+  }
+  .progress{ font-size:11px; color:var(--ink-soft); }
+  .qlabel{
+    font-family:'Space Mono', monospace;
+    font-size:11px; color:var(--ink-soft); margin-bottom:6px;
+  }
+  .qtext{
+    font-family:'Shippori Mincho', serif;
+    font-size:18px;
+    line-height:1.65;
+    color:var(--ink);
+    min-height:70px;
+  }
+  .divider{
+    border:none; border-top:1px dashed var(--line);
+    margin:16px 0;
+  }
+  .answer{
+    display:none;
+  }
+  .answer.show{ display:block; }
+  .alabel{
+    font-family:'Space Mono', monospace;
+    font-size:11px; color:var(--red); margin-bottom:6px;
+  }
+  .atext{
+    font-size:15px; line-height:1.7; color:var(--ink);
+    background:var(--paper-dark);
+    border-left:3px solid var(--red);
+    padding:10px 12px;
+    border-radius:2px;
+  }
+  .tip{
+    margin-top:10px; font-size:12.5px; color:var(--ink-soft); line-height:1.6;
+  }
+
+  .reveal-btn{
+    width:100%; margin-top:16px;
+    background:var(--ink); color:var(--paper);
+    border:none; border-radius:3px;
+    padding:13px; font-size:14px; font-weight:700;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    cursor:pointer;
+  }
+
+  .judge-row{
+    display:flex; gap:10px; margin-top:14px;
+  }
+  .jbtn{
+    flex:1; padding:12px; border-radius:3px; border:1px solid var(--line);
+    font-size:14px; font-weight:700; cursor:pointer;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    background:var(--paper);
+  }
+  .jbtn.ok{ color:var(--moss); border-color:var(--moss); }
+  .jbtn.ng{ color:var(--red); border-color:var(--red); }
+  .jbtn.ok:active{ background:var(--moss); color:#fff; }
+  .jbtn.ng:active{ background:var(--red); color:#fff; }
+
+  .done-card{
+    text-align:center; padding:36px 20px;
+  }
+  .done-card .big{
+    font-family:'Space Mono', monospace; font-size:34px; font-weight:700; color:var(--ink);
+  }
+  .done-card p{ color:var(--ink-soft); font-size:13px; margin-top:6px;}
+  .restart{
+    margin-top:18px; width:100%;
+    background:var(--paper); border:1px solid var(--ink); color:var(--ink);
+    padding:12px; border-radius:3px; font-weight:700; cursor:pointer;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+  }
+
+  .weak-box{
+    margin-top:22px; background:var(--paper-dark); border:1px solid var(--line);
+    border-radius:4px; padding:14px 16px;
+  }
+  .weak-box h2{
+    font-family:'Shippori Mincho', serif; font-size:14px; margin:0 0 8px;
+  }
+  .weak-item{
+    display:flex; justify-content:space-between; font-size:12.5px;
+    padding:5px 0; border-bottom:1px dotted var(--line); color:var(--ink-soft);
+  }
+  .weak-item:last-child{border-bottom:none;}
+  .weak-item b{color:var(--red);}
+
+  .opt-row{ margin:2px 0 12px; }
+  .opt-toggle{
+    display:flex; align-items:center; gap:8px;
+    font-size:12.5px; color:var(--ink-soft); cursor:pointer; user-select:none;
+  }
+  .opt-toggle input{ accent-color:var(--ink); width:15px; height:15px; }
+
+  .sync-box{
+    margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  .sync-btn{
+    font-family:'Zen Kaku Gothic New', sans-serif; font-size:11.5px;
+    padding:7px 10px; background:var(--paper); border:1px solid var(--line);
+    color:var(--ink-soft); border-radius:3px; cursor:pointer;
+  }
+  .sync-btn:active{ background:var(--paper-dark); }
+  .sync-area{
+    width:100%; margin-top:2px; font-family:'Space Mono', monospace; font-size:10.5px;
+    padding:8px; border:1px solid var(--line); border-radius:3px; background:#FBF8EF; color:var(--ink);
+    resize:vertical;
+  }
+  .sync-msg{ font-size:11px; color:var(--moss); }
+
+  footer{
+    text-align:center; margin-top:26px; font-size:10.5px; color:var(--ink-soft);
+    font-family:'Space Mono', monospace;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">CASE IV DRILL</div>
+    <h1>事例Ⅳ 隙間時間ドリル</h1>
+    <div class="sub">電車の中でも、レジ待ちでも。1問30秒〜1分。</div>
+  </header>
+
+  <div class="tape">
+    <div class="tape-row">
+      <span id="tapeMarks" class="tape-marks">まだ記録がありません</span>
+      <span id="tapeRate" class="tape-rate">--%</span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="opt-row">
+    <label class="opt-toggle"><input type="checkbox" id="weakOnlyToggle"> 苦手優先モード（習得済み[連続2回正解]の問題を除外）</label>
+  </div>
+
+  <div class="session-row">
+    <div class="sbtn" data-n="5"><b>5問</b><span>約3分</span></div>
+    <div class="sbtn" data-n="10"><b>10問</b><span>約5〜7分</span></div>
+    <div class="sbtn" data-n="99"><b>全問</b><span>カテゴリ集中</span></div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="weak-box" id="weakBox" style="display:none;">
+    <h2>苦手リスト（正答率が低い順）</h2>
+    <div id="weakList"></div>
+  </div>
+
+  <div class="sync-box">
+    <button class="sync-btn" id="exportBtn">📤 進捗をエクスポート</button>
+    <button class="sync-btn" id="importBtn">📥 進捗をインポート</button>
+    <textarea class="sync-area" id="syncArea" style="display:none;" rows="3" placeholder="ここに進捗JSONを貼り付けて「読み込む」を押す"></textarea>
+    <button class="sync-btn" id="syncApplyBtn" style="display:none;">読み込む</button>
+    <span class="sync-msg" id="syncMsg"></span>
+  </div>
+
+  <footer>全知識&amp;全ノウハウの要点をもとに作成 &middot; 記録は端末(localStorage)に保存されます。新しいバージョンをもらったら「進捗をエクスポート」→次のバージョンで「進捗をインポート」で引き継げます。</footer>
+</div>
+
+<script>
+// ---------------- Question bank ----------------
+const BANK = [
+  // 経営分析
+  {cat:'keiei', q:'売上高総利益率の計算式は？', a:'売上総利益 ÷ 売上高 × 100', tip:'収益性（売上高利益率）の代表指標。'},
+  {cat:'keiei', q:'自己資本比率の計算式は？', a:'自己資本 ÷ 総資本（負債＋純資産）× 100', tip:'安全性の代表指標。高いほど財務的に安全。'},
+  {cat:'keiei', q:'固定長期適合率の計算式は？', a:'固定資産 ÷（固定負債＋自己資本）× 100', tip:'分母が加算になるので電卓のメモリー機能（M+）が有効。'},
+  {cat:'keiei', q:'与件文に「主力製品の売上が伸び悩んでいる」とあれば、まず疑う指標分類は？', a:'収益性（売上高総利益率・売上高営業利益率など）', tip:'定性情報→定量情報の橋渡しを素早く行う練習。'},
+  {cat:'keiei', q:'与件文に「工場設備が老朽化し稼働率が低下」とあれば？', a:'効率性（有形固定資産回転率など）', tip:'設備関連のキーワードは効率性に直結しやすい。'},
+  {cat:'keiei', q:'与件文に「借入金が増加し支払利息の負担が重い」とあれば？', a:'安全性（負債比率・インタレスト・カバレッジ・レシオなど）', tip:''},
+  {cat:'keiei', q:'棚卸資産回転率の計算式は？', a:'売上高 ÷ 棚卸資産', tip:'回転期間で聞かれたら「棚卸資産 ÷ 月商」等に読み替える。'},
+  {cat:'keiei', q:'経営分析で指標を「1つに絞れない」ときの心構えは？', a:'合理的に説明できるならどれを選んでもよい、というスタンスで臨む', tip:'絞り込みに時間を使いすぎない。'},
+  {cat:'keiei', q:'老朽化した設備を長年更新していない企業で、有形固定資産回転率を計算すると数値はどう出やすい？', a:'簿価（減価償却が進んだ分）が下がっているため、実態が非効率でも回転率は高く（良く）出やすい', tip:'定性情報「非効率・老朽化」と指標の動きが逆行する典型パターン。'},
+  {cat:'keiei', q:'計算した指標の動きが与件文の定性情報と逆行してしまった場合、本番の解答でどう対応すべき？', a:'その指標は採用せず、定性情報と方向が一致する別の指標に切り替える。矛盾を字数内で説明しようとしない', tip:'指標選定は「与件文と整合するか」を逆算のチェックに使う。矛盾の説明自体が問われている設問は例外。'},
+  {cat:'keiei', q:'原材料価格の高騰は、収益性指標のうちどれに最も直接的に表れる？', a:'売上総利益率（売上原価の増加として直接反映される）', tip:'売上高営業利益率より一段階手前の指標。'},
+  {cat:'keiei', q:'人件費上昇（特に人手不足による）は、収益性指標のうちどれにより表れやすい？', a:'売上高営業利益率（販管費または製造原価に人件費が乗り、総利益率より下の段階でさらに悪化する）', tip:'総利益率と営業利益率の両方が悪化している場合、原価要因と販管費要因を切り分けて2段階の因果で説明する。'},
+
+  // CVP
+  {cat:'cvp', q:'損益分岐点売上高の計算式は？', a:'固定費 ÷（1－変動費率）', tip:'変動費率＝変動費÷売上高。'},
+  {cat:'cvp', q:'目標利益を達成する売上高の計算式は？', a:'（固定費＋目標利益）÷（1－変動費率）', tip:''},
+  {cat:'cvp', q:'損益分岐点比率の計算式は？', a:'損益分岐点売上高 ÷ 実際（予想）売上高 × 100', tip:'低いほど収益体質が安定している。'},
+  {cat:'cvp', q:'安全余裕率の計算式は？', a:'（売上高－損益分岐点売上高）÷ 売上高 × 100（＝100－損益分岐点比率）', tip:''},
+  {cat:'cvp', q:'営業レバレッジが高い企業の特徴は？', a:'固定費比率が高く、売上変動に対して利益が大きく変動する（ハイリスク・ハイリターン）', tip:''},
+  {cat:'cvp', q:'CVP問題に取り組む最初の一手は？', a:'与件文・設問文から変動費／固定費に該当する項目を漏れなく拾い出す', tip:'ここでの拾い漏れが致命傷になる。'},
+  {cat:'cvp', q:'損益分岐点売上高の計算で電卓のどの機能が有効？', a:'メモリー機能（M+/RM）。分母の「1－変動費率」を先に計算してメモリーに保持する', tip:''},
+  {cat:'cvp', q:'CVPの難易度と時間配分の注意点は？', a:'計算自体は難しくないが、短時間で正答を導くことが求められる点に注意', tip:''},
+  {cat:'cvp', q:'複数部門のデータから全社の変動費率を求めるときの正しい手順は？', a:'各部門の変動費率を単純平均するのではなく、全部門の変動費合計 ÷ 全部門の売上高合計で算出する', tip:'部門ごとの売上規模が異なる場合、単純平均だと構成比のズレが誤差になる。'},
+  {cat:'cvp', q:'税引後目標利益から税引前目標利益に変換する式は？', a:'税引前目標利益 ＝ 税引後目標利益 ÷（1－実効税率）', tip:'CVPの目標利益達成売上高の式にはこの税引前の値を使う。'},
+  {cat:'cvp', q:'税引後目標利益を達成する売上高を求める全体の式は？', a:'（固定費＋税引前目標利益）÷（1－変動費率）。税引前目標利益＝税引後目標利益÷（1－実効税率）で先に変換しておく', tip:'税引後→税引前の変換を忘れて税引後の値のまま計算すると誤答になる典型ミス。'},
+  {cat:'cvp', q:'部門構成比を変えずに全体売上高がx%減少したとき、営業利益はどう計算する？', a:'変化後の売上高 ×（1－全社変動費率）－ 固定費。構成比が同一なら全社変動費率は変わらないため、そのまま使える', tip:'構成比が変わらない前提が崩れる問題では、部門ごとに再計算が必要になる点に注意。'},
+  {cat:'cvp', q:'税引後目標利益が問題文に出てきたとき、最初に必ず行うべき変換は？', a:'税引前目標利益＝税引後目標利益÷（1－実効税率）に変換してから、固定費と合算する', tip:'複数設問を跨ぐ総合問題（限界利益率を先に求めてから目標売上高を出す等）では、直前の設問操作に気を取られてこの変換を忘れやすい。目標利益の数字を見たら反射的に税引前へ変換する癖をつける。'},
+  {cat:'cvp', q:'価格引き下げ施策の評価で「販売数量が増える」という情報を見た時、真っ先に確認すべきことは？', a:'新価格－1個あたり変動費（＝新しい限界利益）の符号がプラスかマイナスか。マイナスなら売れば売るほど損失が拡大するため、数量増加は良い施策とは言えない', tip:'数量増加という一見プラスの情報に引きずられず、単価が変動費を下回っていないかを先に検算する。'},
+  {cat:'cvp', q:'【M社】社内使用部品を自社製造（変動費1,200円/個、年間固定費18,000,000円）するか外注化（単価1,800円/個、固定費なし）するか検討中。クロスオーバー・ポイントは30,000個。年間必要量は20,000〜40,000個で変動見込み。需要変動リスクの観点も含めて、どちらを採用すべきか100字以内で述べよ。', a:'自社製造は固定費が大きく需要増加時に有利だが需要減少時はコスト高となるリスクがある。需要予測の中心が30,000個を上回るなら自社製造、下回るリスクが高いなら外注化が妥当。（86字）', tip:'固定費型（自社製造）はハイリスク・ハイリターン、変動費型（外注）はローリスク・ローリターンという営業レバレッジの構図。一方向に断定せず、需要水準・リスク許容度に応じた条件付き結論にすると評価されやすい。'},
+  {cat:'cvp', q:'【M社・続き】年間必要量30,000個（＝クロスオーバー・ポイント）のときの自社製造と外注化の総原価差額を求め、これを自社製造の年間固定費と比較してどちらが有利かを説明せよ。', a:'総原価の差は0円であり、これは自社製造で生じる変動費の節約額（600円×30,000個＝18,000,000円）と、自社製造にかかる年間固定費18,000,000円が等しいことを意味する。したがってこの生産量では、固定費負担が変動費節約によって完全に相殺されており、自社製造・外注化のどちらが有利とも判断できない。', tip:'クロスオーバー・ポイントとは「固定費の増分」と「変動費節約累計額」が一致する点、という数値的な意味を説明できるかが問われる。売上を伴わないコスト比較の文脈では「限界利益」という用語は使わず、「変動費の節約額」等と表現する。'},
+  {cat:'cvp', q:'CVP・意思決定会計の問題を解いた後、答えの妥当性を確認する簡単なチェック方法は？', a:'算出した固定費や目標利益が、売上高の規模に対して桁違いに大きくないか（例：固定費が売上高を上回っていないか）を概算で確認する', tip:'計算過程に誤りがなくても、問題設定自体や自分の単位換算に誤りがあると非現実的な結果が出る。結果が明らかにおかしい場合は、固定費の年額・月額換算など単位の取り違えを疑う。'},
+  {cat:'ishi', q:'生産能力に余裕がある状況で、通常の販売価格より低い価格の特別注文（追加受注）を受けるべきか判断する差額分析の基本は？', a:'特別注文による増分限界利益（受注数量×（特別価格－変動費））と、その注文に固有の追加費用（一時費用等）を比較し、差額がプラスなら受けるべきと判断する', tip:'全社固定費は通常、この意思決定には関係しない（後述）。'},
+  {cat:'ishi', q:'特別注文の受注可否を差額分析する際、生産能力に余裕がある前提のもとで全社固定費を計算に含めない（含めるべきでない）理由を40字程度で述べるなら？', a:'生産能力に余裕があり特別注文を受けても固定費が増加しないため', tip:'固定費は特別注文の有無にかかわらず一定額発生する埋没原価的性質を持つため、意思決定に無関係。ただし能力に余裕がなく設備増強が必要な場合は、その増分固定費を含める必要がある点に注意。'},
+  {cat:'cvp', q:'CVP計算で損益分岐点や目標利益達成売上高を求めるとき、分母（または単位あたりの利益）として使うべきなのは何？', a:'1個あたり限界利益（販売価格－変動費）。変動費そのものを使うのは誤り', tip:'「限界利益」と「変動費」を取り違える初歩的だが致命的なミス。CVPの分母には必ず「販売価格－変動費」を使う。'},
+  {cat:'cvp', q:'生産量が一定の閾値を超えると固定費が段階的に増加する「階段状固定費」の構造で、需要が増加ライン稼働後の損益分岐点を上回る場合でも、増産すべきでないことがあるのはなぜ？', a:'増産で得られる追加の限界利益（増加数量×1個あたり限界利益）が、増産に伴う固定費の増加額を下回る場合があるため。損益分岐点を超えているかだけでなく、営業利益そのものを両ケースで比較する必要がある', tip:'需要が生産能力の上限を少し超える程度のとき特に起こりやすい。感覚的な「需要があるから増産すべき」という直感に反する結果になりうる。'},
+
+  // 意思決定会計 / NPV
+  {cat:'ishi', q:'NPV（正味現在価値）の基本式は？', a:'ΣCFₙ/(1+r)ⁿ － 投資額（r：資本コスト、n：年数）', tip:''},
+  {cat:'ishi', q:'なぜ割引計算にCF₁を使い、CF₀は使わないのか？', a:'CF₀（現時点）はすでに実現済みで割引の対象外だから。CF₁以降を現在価値に割り引く', tip:'等比数列の導出から必然的に導かれる。'},
+  {cat:'ishi', q:'税引後キャッシュフローの基本計算パターンは？', a:'（収入－支出－減価償却費）×（1－税率）＋ 減価償却費', tip:'「減価償却費を引いてから税金計算→最後に足し戻す」がタックスシールドの型。'},
+  {cat:'ishi', q:'意思決定会計を解く「手順1」は？', a:'設問から投資する額と投資を実行する時期を把握する', tip:''},
+  {cat:'ishi', q:'意思決定会計で難易度が高い設問に直面したら？', a:'時間をかけすぎず、場合によっては捨て問にする判断も必要', tip:'事例Ⅳ全体の得点最大化を優先。'},
+  {cat:'ishi', q:'回収期間法の特徴は？', a:'時間的価値を考慮せず、投資額 ÷ 年間キャッシュフローで簡便に回収期間を算出する方法', tip:''},
+  {cat:'ishi', q:'プロジェクト終了時点に残る設備の価値はどう扱う？', a:'投資額（または回収額）としてその時点のキャッシュフローに含めて認識する', tip:''},
+  {cat:'ishi', q:'計算過程を記述する設問で書くべき4要素と、書く際に意識すべき重要度の順は？', a:'①計算の方針②途中の主な指標名・値・式③計算式④計算の結果。記述は①→④の順だが、重要度は④→①を意識する', tip:'部分点を取りにいく書き方。'},
+  {cat:'ishi', q:'設備更新のNPV問題で「毎年の増分キャッシュフロー」と「最終年度のキャッシュフロー」を別々の設問で問われた場合、最終年度の設備売却・運転資本回収はどちらに含めるべき？', a:'「毎年の増分CF」には含めず、最終年度は別建て（営業CF＋設備売却・運転資本回収の期末特殊要因）として切り分けて記述する', tip:'最終的なNPVの計算結果は同じでも、設問ごとに求められた区分どおりに答えないと部分点で不利になる。'},
+  {cat:'ishi', q:'旧設備を売却・除却する場合の除却損タックスシールドについて、問題文に計上タイミングの明記がないときのデフォルトの扱いは？', a:'除却・売却という取引が発生した時点のCFに含める（例：投資と同時にt=0で処分するならt=0、耐用年数経過後の最終年度末に処分するならその年度末）', tip:'固定的に「常にt=0」なのではなく「取引が起きた時点に対応させる」のが原則。平成29年度第3問は期末処分のケースとして参考になる。'},
+
+  // WACC・企業価値評価・M&A
+  {cat:'wacc', q:'本試験のWACC計算で、資本構成の重み付けに使う「負債」は理論上の有利子負債ではなく何を使う慣行があるか？', a:'負債合計（総資本＝負債合計＋自己資本）を使う簡便的なバランスシートベースの計算が本試験の慣行', tip:'理論通りの「有利子負債のみ」で計算すると失点するので要注意。'},
+  {cat:'wacc', q:'M&A・合併の価値算定で、投資額として使うべき資産のベースは？', a:'取得資産の総額（グロス）。純資産（ネット）ではない', tip:'ここを取り違えると価値創造の有無の結論が逆転しうる。'},
+  {cat:'wacc', q:'WACCの基本的な構成要素は？', a:'負債コスト×(1－実効税率)×負債構成比 ＋ 株主資本コスト×自己資本構成比', tip:''},
+  {cat:'wacc', q:'ゴードン成長モデルによる株式価値評価の式は？', a:'株式価値 ＝ CF₁ ÷（r － g）（r：資本コスト、g：成長率）', tip:'分子はCF₀ではなくCF₁。'},
+  {cat:'wacc', q:'分析期間終了後も事業が継続する前提で、成長率ゼロの継続価値（ターミナルバリュー）を求める式は？', a:'継続価値 ＝ 分析期間終了後の税引後キャッシュフロー（永続する年間CF）÷ 資本コストr（成長率ゼロのゴードン成長モデル＝永久年金の現在価値）', tip:'この値は「分析期間終了時点」の価値として求まるため、現時点（t=0）まで割り引くにはさらに資本コストで割引計算する必要がある。'},
+  {cat:'wacc', q:'設備が耐用年数どおり全額償却済みになった後（分析期間終了後）のキャッシュフローを継続価値に用いる場合、減価償却費のタックスシールドはどう扱う？', a:'発生しない。設備が全額償却済みのため以後は減価償却費自体が計上されず、その分の節税効果も存在しない。継続価値の算定には現金収支のみの税引後キャッシュフローを用いる', tip:'分析期間中（設備償却中）のCFにはタックスシールドを含めるが、継続価値算定時のCFには含めない、という区別を見落としやすい。'},
+  {cat:'wacc', q:'WACC・M&A価値の計算ミスがとくに致命的な理由は？', a:'その後の「投資すべきか／価値創造があるか」という結論が逆転し、設問全体が不正解になりうるため', tip:''},
+  {cat:'wacc', q:'合併で発生する「のれん」の扱いは？', a:'買収価格が取得純資産の時価を上回る差額を、のれん（資産）として計上する', tip:''},
+  {cat:'wacc', q:'企業価値評価でFCFの起点として適切な利益は？', a:'営業利益（税引後）。財務活動の影響を受けない、金融費用控除前の利益から算出する', tip:'事例Ⅳの原則：営業利益は財務活動の影響を受けないため使いやすい。'},
+  {cat:'wacc', q:'WACC問題を解く前に、まず何を確認すべきか？', a:'与件文・設問に「有利子負債」「負債合計」のどちらの語が使われているか、及びこの試験特有の簡便計算を使うべきかを確認する', tip:'自分がした過去のミスパターン。'},
+
+  // セグメント別会計
+  {cat:'segment', q:'限界利益の定義は？', a:'売上高 － 変動費', tip:''},
+  {cat:'segment', q:'貢献利益の定義は？', a:'限界利益 － 個別固定費（そのセグメント固有の固定費）', tip:''},
+  {cat:'segment', q:'あるセグメントの撤退可否を判断するときに見るべき利益は？', a:'貢献利益（マイナスなら撤退候補）。共通固定費配賦後の営業利益だけで判断しない', tip:'共通固定費は撤退しても残ることが多い点に注意。'},
+  {cat:'segment', q:'最適セールスミックスを決める基準は？', a:'制約条件（生産能力等）1単位あたりの限界利益が高い製品を優先する', tip:''},
+  {cat:'segment', q:'機械稼働時間・労務時間など2つ以上の制約条件が存在するLP（線形計画）問題で、連立方程式を解いて求めた交点が本当に最適解であることを証明するには？', a:'実行可能領域（すべての制約を満たす範囲）の頂点をすべて洗い出し、各頂点で目的関数（限界利益合計）の値を計算して比較する。目的関数の最大値は必ず頂点のどれかで実現されるため、全頂点を比較すれば最適解を証明できる', tip:'連立方程式の交点を求めただけでは証明にならない。x軸・y軸との交点、各制約線同士の交点をすべて候補として評価する。'},
+  {cat:'segment', q:'2つ以上の制約条件があり、それぞれの制約で優先すべき製品が異なる場合、なぜ「1つの製品に生産を集中させる」という単純な結論にならないのか、40字程度で述べるなら？', a:'一方に集中すると他方の制約に余裕が生じ、資源を使い切れず最適でなくなるため', tip:'例：機械稼働時間だけ見て有利な製品に全振りすると、労務時間の方に遊休（使い切れない余裕）が生じ、限られた経営資源をフル活用できない。'},
+  {cat:'segment', q:'LP問題で「実行可能領域の頂点で最適解が実現される」という一般定理を、本試験の解答にそのまま書いてよいか？', a:'書く必要はない、むしろ書かない方がよい。定理の説明ではなく、頂点の候補（他の生産パターン）を数値で列挙し、目的関数の値を比較した「作業の跡」を簡潔に示す方が有効', tip:'事例Ⅳの「計算過程を示す」とは理論的な証明を書くことではなく、採点者が数値の追跡ができる形で示すこと。時間対効果を考え、定理の説明より数値比較に時間を使う。'},
+  {cat:'segment', q:'未知数(x)を使う問題を解くコツは？', a:'与件文の条件を式に落とし込み、損益分岐点や目標値に関する方程式を立てて解く', tip:''},
+  {cat:'segment', q:'セグメント別会計の出題頻度と難易度の傾向は？', a:'2〜3年に1回程度の出題。概念自体は容易で計算量も多くなく、難易度はやや低め', tip:'得点源にしやすいテーマ。'},
+  {cat:'segment', q:'機械稼働時間などの経営資源がフル稼働（供給制約あり）の状況で、あるセグメントの撤退可否を判断する際、貢献利益がプラスでも撤退を検討すべき場合があるのはなぜ？', a:'撤退で解放される稀少資源（機械稼働時間等）を他の高収益セグメントに振り向けた場合の機会利益が、失う貢献利益を上回ることがあるため', tip:'貢献利益単体では判断せず、機会利益とセットで全社利益への影響を計算する。'},
+  {cat:'segment', q:'フル稼働制約下でのセグメント撤退判断で、全社利益への影響額はどう計算する？', a:'（失う貢献利益）と（解放された資源を転用して得られる機会利益）を比較し、機会利益－失う貢献利益＝全社利益への影響額として算出する', tip:'回避不可能個別固定費の配賦替えは全社利益に影響しない点に注意（配賦先が変わるだけ）。'},
+  {cat:'segment', q:'制約資源（倉庫棚数等）を解放して他セグメントに転用する際、「1個あたりの資源使用量」が問題文に与えられていない場合、機会利益はどう見積もる？', a:'解放される資源量が、転用先セグメントの既存資源量に対してどれくらいの割合かを算出し、その比率を既存の売上高に掛けて追加売上高を見積もったうえで、限界利益率を掛けて機会利益を求める', tip:'機械稼働時間のように「1個あたり時間」が明確な場合は直接個数を計算できるが、倉庫棚数のように物量が抽象的な場合は既存実績に対する比例配分（按分）の発想が必要になる。'},
+  {cat:'segment', q:'「単純な貢献利益基準だけで撤退可否を判断すると誤る可能性があるのはなぜか」という設問に、40字程度で答えるなら？', a:'フル稼働下では解放される稀少資源の機会利益を考慮しないと判断を誤るため', tip:'理由説明系の設問は「稀少資源の機会利益」という核心語だけに絞って一文で言い切ると字数が収まりやすい。'},
+
+  // キャッシュフロー計算
+  {cat:'cf', q:'間接法で営業CFを算出する出発点は？', a:'税引前当期純利益（または営業利益）に非資金費用（減価償却費）を加算し、運転資本の増減を調整する', tip:''},
+  {cat:'cf', q:'売上債権が増加した場合、営業CFへの影響は？', a:'マイナス調整（現金回収が遅れている分を差し引く）', tip:''},
+  {cat:'cf', q:'棚卸資産が増加した場合、営業CFへの影響は？', a:'マイナス調整（現金が在庫に変わっている分を差し引く）', tip:''},
+  {cat:'cf', q:'固定資産の売却によるキャッシュフローはどの区分に入る？', a:'投資キャッシュフロー', tip:''},
+  {cat:'cf', q:'配当金の支払いはどの区分に入る？', a:'財務キャッシュフロー', tip:''},
+  {cat:'cf', q:'CF計算でミスが多発する主な原因と対策は？', a:'符号の反転や条件の考慮漏れが主因。B/S科目の増減を1つずつ機械的に確認するテクニックで防ぐ', tip:''},
+
+  // ケアレスミス・電卓・時間配分
+  {cat:'careless', q:'電卓のメモリー機能（M+/M-/RM）を使う代表的な場面は？', a:'分母が加算を含む指標の計算（固定長期適合率、損益分岐点売上高など）', tip:''},
+  {cat:'careless', q:'本試験で解く順序を決める4つの観点は？', a:'①処理量の多さ ②問われている事項の難しさ ③設問構造（前問との関連性）④解答様式（計算過程の記述要否）', tip:''},
+  {cat:'careless', q:'得点効率を考えるときの時間の目安は？', a:'合格基準60点を60分で取ると考え「10分＝10点」を目安に配分する（80分のうち与件文を読む時間等20分を除いた60分で考える）', tip:''},
+  {cat:'careless', q:'前問の結果を使う設問（構造的関連性が高い設問）のリスクは？', a:'前問が不正解だと連鎖的に失点しやすい。優先順位づけや検算に注意する', tip:''},
+  {cat:'careless', q:'計算過程の記述が求められる設問が「有利」と言えるのはなぜ？', a:'最終結果が誤っていても、部分点を得られる可能性があるため', tip:''},
+  {cat:'careless', q:'事例Ⅳ対策の核心（初学者向けポイント）を一言でいうと？', a:'出題されるテーマの知識と要点をいち早く理解し、自分のレベルに合った過去問を繰り返し解いて、解き方を身につけること', tip:''},
+  {cat:'careless', q:'NPVのように複数年・複数項目を積み上げて計算する問題で、計算ロジックは正しいのに答えがズレるとき、原因として真っ先に疑うべきことは？', a:'計算用紙への転記ミス（桁の書き間違い）や電卓への入力ミス（数字の押し間違い・見間違い）', tip:'ロジック自体が合っていても、大きな桁の数字を計算用紙⇔電卓間で行き来させる過程で一桁ズレや読み違いが起きやすい。数字を電卓に打つ前に一度心の中で読み上げる、計算用紙の数字と電卓表示を照合してから次に進む、といった小さな確認習慣で防げる。'},
+];
+
+const CAT_LABELS = {
+  all:'全部', keiei:'経営分析', cvp:'CVP', ishi:'意思決定会計',
+  wacc:'WACC・企業価値', segment:'セグメント', cf:'CF計算', careless:'解き方・電卓'
+};
+
+// ---------------- State ----------------
+let currentCat = 'all';
+let session = [];
+let sIndex = 0;
+let sScore = 0;
+let revealed = false;
+let stats = {}; // { "cat|q": {correct, total} }
+let weakOnly = false;
+
+const STORAGE_KEY = 'case4-drill-stats';
+const WEAKONLY_KEY = 'case4-drill-weakonly';
+
+const stage = document.getElementById('stage');
+const tabsEl = document.getElementById('tabs');
+const weakBox = document.getElementById('weakBox');
+const weakList = document.getElementById('weakList');
+
+function keyFor(item){ return item.cat + '|' + item.q; }
+
+function isMastered(item){
+  const s = stats[keyFor(item)];
+  return !!(s && s.total >= 2 && s.correct === s.total);
+}
+
+function loadStats(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ stats = JSON.parse(raw); }
+  }catch(e){ stats = {}; }
+  try{ weakOnly = localStorage.getItem(WEAKONLY_KEY) === '1'; }catch(e){ weakOnly = false; }
+  renderTape();
+  renderWeak();
+}
+function saveStats(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stats)); }
+  catch(e){ /* storage unavailable, session-only fallback */ }
+}
+
+function renderTape(){
+  const entries = Object.values(stats);
+  if(entries.length === 0){
+    document.getElementById('tapeMarks').textContent = 'まだ記録がありません';
+    document.getElementById('tapeRate').textContent = '--%';
+    return;
+  }
+  let totalC=0, totalT=0;
+  entries.forEach(s=>{ totalC+=s.correct; totalT+=s.total; });
+  const rate = totalT? Math.round(totalC/totalT*100) : 0;
+  // last marks: build from a rolling log
+  const log = (window.__drillLog || []).slice(-14);
+  const marks = log.map(x=> x ? '<span class="ok">○</span>' : '<span class="ng">✕</span>').join(' ');
+  document.getElementById('tapeMarks').innerHTML = marks || '記録あり・履歴は今回のセッションから表示';
+  document.getElementById('tapeRate').textContent = '累計正答率 ' + rate + '%';
+}
+
+function renderWeak(){
+  const arr = Object.entries(stats)
+    .filter(([k,s]) => s.total >= 2)
+    .map(([k,s]) => ({key:k, q:k.split('|')[1], cat:k.split('|')[0], rate: s.correct/s.total, total:s.total}))
+    .sort((a,b)=> a.rate - b.rate)
+    .slice(0,5);
+  if(arr.length === 0){ weakBox.style.display='none'; return; }
+  weakBox.style.display='block';
+  weakList.innerHTML = arr.map(x=>`<div class="weak-item"><span>［${CAT_LABELS[x.cat]||x.cat}］${x.q}</span><b>${Math.round(x.rate*100)}%</b></div>`).join('');
+}
+
+function renderTabs(){
+  const cats = ['all', ...Array.from(new Set(BANK.map(b=>b.cat)))];
+  tabsEl.innerHTML = cats.map(c=>{
+    const cnt = c==='all' ? BANK.length : BANK.filter(b=>b.cat===c).length;
+    return `<div class="tab ${c===currentCat?'active':''}" data-cat="${c}">${CAT_LABELS[c]||c}<span class="cnt">(${cnt})</span></div>`;
+  }).join('');
+  tabsEl.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click', ()=>{ currentCat = t.dataset.cat; renderTabs(); });
+  });
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function startSession(n){
+  let pool = currentCat==='all' ? BANK : BANK.filter(b=>b.cat===currentCat);
+  if(weakOnly) pool = pool.filter(b=>!isMastered(b));
+  session = shuffle(pool).slice(0, Math.min(n, pool.length));
+  sIndex = 0; sScore = 0; revealed = false;
+  window.__drillLog = [];
+  renderCard();
+}
+
+function renderCard(){
+  if(sIndex >= session.length){
+    renderDone();
+    return;
+  }
+  const item = session[sIndex];
+  revealed = false;
+  stage.innerHTML = `
+    <div class="card">
+      <div class="card-top">
+        <span>${CAT_LABELS[item.cat]||item.cat}</span>
+        <span class="progress">${sIndex+1} / ${session.length}</span>
+      </div>
+      <div class="qlabel">Q.</div>
+      <div class="qtext">${item.q}</div>
+      <hr class="divider">
+      <div class="answer" id="ansBlock">
+        <div class="alabel">A.</div>
+        <div class="atext">${item.a}</div>
+        ${item.tip ? `<div class="tip">💡 ${item.tip}</div>` : ''}
+      </div>
+      <button class="reveal-btn" id="revealBtn">答えを見る</button>
+      <div class="judge-row" id="judgeRow" style="display:none;">
+        <div class="jbtn ok" id="okBtn">○ 正解できた</div>
+        <div class="jbtn ng" id="ngBtn">✕ 間違えた</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('revealBtn').addEventListener('click', ()=>{
+    document.getElementById('ansBlock').classList.add('show');
+    document.getElementById('revealBtn').style.display='none';
+    document.getElementById('judgeRow').style.display='flex';
+  });
+  document.getElementById('okBtn').addEventListener('click', ()=> judge(true));
+  document.getElementById('ngBtn').addEventListener('click', ()=> judge(false));
+}
+
+function judge(correct){
+  const item = session[sIndex];
+  const k = keyFor(item);
+  if(!stats[k]) stats[k] = {correct:0, total:0};
+  stats[k].total += 1;
+  if(correct){ stats[k].correct += 1; sScore += 1; }
+  window.__drillLog.push(correct);
+  saveStats();
+  renderTape();
+  sIndex += 1;
+  renderCard();
+}
+
+function renderDone(){
+  renderWeak();
+  stage.innerHTML = `
+    <div class="card done-card">
+      <div class="eyebrow" style="margin-bottom:10px;">SESSION COMPLETE</div>
+      <div class="big">${sScore} / ${session.length}</div>
+      <p>お疲れさまでした。また隙間時間にどうぞ。</p>
+      <button class="restart" id="restartBtn">もう一度（同じ条件で）</button>
+    </div>
+  `;
+  document.getElementById('restartBtn').addEventListener('click', ()=>{
+    const n = session.length;
+    startSession(n >= BANK.length ? 99 : n);
+  });
+}
+
+// ---------------- Init ----------------
+renderTabs();
+loadStats();
+stage.innerHTML = `
+  <div class="card done-card">
+    <div class="eyebrow" style="margin-bottom:10px;">READY</div>
+    <div style="font-family:'Shippori Mincho',serif; font-size:16px; margin:8px 0 4px;">カテゴリを選んで、問題数を選択</div>
+    <p>与件文なしで解ける知識・公式・判断基準を中心に出題します。</p>
+  </div>
+`;
+document.querySelectorAll('.sbtn').forEach(b=>{
+  b.addEventListener('click', ()=> startSession(parseInt(b.dataset.n,10)));
+});
+
+const weakOnlyToggle = document.getElementById('weakOnlyToggle');
+weakOnlyToggle.checked = weakOnly;
+weakOnlyToggle.addEventListener('change', ()=>{
+  weakOnly = weakOnlyToggle.checked;
+  try{ localStorage.setItem(WEAKONLY_KEY, weakOnly ? '1' : '0'); }catch(e){}
+});
+
+const syncArea = document.getElementById('syncArea');
+const syncApplyBtn = document.getElementById('syncApplyBtn');
+const syncMsg = document.getElementById('syncMsg');
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  syncArea.value = JSON.stringify(stats);
+  syncArea.style.display = 'block';
+  syncApplyBtn.style.display = 'none';
+  syncArea.focus();
+  syncArea.select();
+  syncMsg.textContent = '';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(syncArea.value)
+      .then(()=>{ syncMsg.textContent = 'コピーしました。新しいバージョンの「進捗をインポート」に貼り付けてください。'; })
+      .catch(()=>{ syncMsg.textContent = '下のテキストを選択してコピーしてください。'; });
+  }else{
+    syncMsg.textContent = '下のテキストを選択してコピーしてください。';
+  }
+});
+
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  syncArea.value = '';
+  syncArea.style.display = 'block';
+  syncApplyBtn.style.display = 'inline-block';
+  syncArea.focus();
+  syncMsg.textContent = '';
+});
+
+syncApplyBtn.addEventListener('click', ()=>{
+  try{
+    const imported = JSON.parse(syncArea.value);
+    stats = Object.assign({}, stats, imported);
+    saveStats();
+    renderTape();
+    renderWeak();
+    syncMsg.textContent = '読み込みました（' + Object.keys(imported).length + '件）。';
+  }catch(e){
+    syncMsg.textContent = '読み込みに失敗しました。JSONの形式を確認してください。';
+  }
+});
+</script>
+</body>
+</html>
