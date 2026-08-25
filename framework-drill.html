@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>事例Ⅰ〜Ⅲ 頭文字フレームワークドリル</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --paper:#F5EFE1;
+    --paper-dark:#EDE4CE;
+    --line:#CFC3A3;
+    --ink:#26314A;
+    --ink-soft:#5B5747;
+    --red:#A23B2E;
+    --moss:#4B6B4E;
+    --gold:#B08A3E;
+    --card-shadow: 0 1px 0 rgba(38,49,74,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(180deg, transparent, transparent 27px, var(--line) 28px),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+    min-height:100vh;
+    padding:18px 14px 60px;
+  }
+
+  .wrap{max-width:480px; margin:0 auto;}
+
+  /* ---- Header / tape ---- */
+  header{
+    text-align:center;
+    padding:6px 0 14px;
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    color:var(--gold);
+    text-transform:uppercase;
+  }
+  h1{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:26px;
+    margin:4px 0 2px;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  .tape{
+    margin-top:14px;
+    background:#FBF8EF;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:10px 12px;
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    position:relative;
+    box-shadow: var(--card-shadow);
+  }
+  .tape::before, .tape::after{
+    content:"";
+    position:absolute; left:0; right:0; height:6px;
+    background-image: linear-gradient(45deg, var(--paper) 50%, transparent 50%), linear-gradient(-45deg, var(--paper) 50%, transparent 50%);
+    background-size: 10px 6px; background-repeat:repeat-x;
+  }
+  .tape::before{ top:-6px; background-position: 0 6px;}
+  .tape::after{ bottom:-6px; transform:rotate(180deg);}
+  .tape-row{display:flex; justify-content:space-between; align-items:center;}
+  .tape-marks{letter-spacing:3px; font-size:15px;}
+  .tape-marks .ok{color:var(--moss);}
+  .tape-marks .ng{color:var(--red);}
+  .tape-rate{font-weight:700; color:var(--ink);}
+
+  /* ---- Tabs ---- */
+  .tabs{
+    display:flex; flex-wrap:wrap; gap:6px;
+    margin:16px 0 10px;
+  }
+  .tab{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:12.5px;
+    padding:6px 10px;
+    border:1px solid var(--line);
+    background:var(--paper-dark);
+    color:var(--ink-soft);
+    border-radius:3px;
+    cursor:pointer;
+    user-select:none;
+    transition:all .15s ease;
+  }
+  .tab.active{
+    background:var(--ink);
+    color:var(--paper);
+    border-color:var(--ink);
+  }
+  .tab .cnt{opacity:.65; font-size:10.5px; margin-left:2px;}
+
+  /* ---- Session buttons ---- */
+  .session-row{display:flex; gap:8px; margin:6px 0 18px;}
+  .sbtn{
+    flex:1;
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    padding:10px 4px;
+    text-align:center;
+    background:var(--paper);
+    border:1px solid var(--ink);
+    color:var(--ink);
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .sbtn:active{ background:var(--ink); color:var(--paper); }
+  .sbtn b{display:block; font-size:16px;}
+  .sbtn span{font-size:9.5px; color:var(--ink-soft); font-family:'Zen Kaku Gothic New',sans-serif;}
+
+  /* ---- Card ---- */
+  .stage{ min-height:340px; }
+  .card{
+    background:#FBF8EF;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:22px 20px 18px;
+    box-shadow: var(--card-shadow);
+    position:relative;
+  }
+  .card-top{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Space Mono', monospace;
+    font-size:11px; color:var(--gold);
+    letter-spacing:.06em;
+    margin-bottom:14px;
+  }
+  .progress{ font-size:11px; color:var(--ink-soft); }
+  .qlabel{
+    font-family:'Space Mono', monospace;
+    font-size:11px; color:var(--ink-soft); margin-bottom:6px;
+  }
+  .qtext{
+    font-family:'Shippori Mincho', serif;
+    font-size:18px;
+    line-height:1.65;
+    color:var(--ink);
+    min-height:70px;
+  }
+  .divider{
+    border:none; border-top:1px dashed var(--line);
+    margin:16px 0;
+  }
+  .answer{
+    display:none;
+  }
+  .answer.show{ display:block; }
+  .alabel{
+    font-family:'Space Mono', monospace;
+    font-size:11px; color:var(--red); margin-bottom:6px;
+  }
+  .atext{
+    font-size:15px; line-height:1.7; color:var(--ink);
+    background:var(--paper-dark);
+    border-left:3px solid var(--red);
+    padding:10px 12px;
+    border-radius:2px;
+  }
+  .tip{
+    margin-top:10px; font-size:12.5px; color:var(--ink-soft); line-height:1.6;
+  }
+
+  .reveal-btn{
+    width:100%; margin-top:16px;
+    background:var(--ink); color:var(--paper);
+    border:none; border-radius:3px;
+    padding:13px; font-size:14px; font-weight:700;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    cursor:pointer;
+  }
+
+  .judge-row{
+    display:flex; gap:10px; margin-top:14px;
+  }
+  .jbtn{
+    flex:1; padding:12px; border-radius:3px; border:1px solid var(--line);
+    font-size:14px; font-weight:700; cursor:pointer;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    background:var(--paper);
+  }
+  .jbtn.ok{ color:var(--moss); border-color:var(--moss); }
+  .jbtn.ng{ color:var(--red); border-color:var(--red); }
+  .jbtn.ok:active{ background:var(--moss); color:#fff; }
+  .jbtn.ng:active{ background:var(--red); color:#fff; }
+
+  .done-card{
+    text-align:center; padding:36px 20px;
+  }
+  .done-card .big{
+    font-family:'Space Mono', monospace; font-size:34px; font-weight:700; color:var(--ink);
+  }
+  .done-card p{ color:var(--ink-soft); font-size:13px; margin-top:6px;}
+  .restart{
+    margin-top:18px; width:100%;
+    background:var(--paper); border:1px solid var(--ink); color:var(--ink);
+    padding:12px; border-radius:3px; font-weight:700; cursor:pointer;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+  }
+
+  .weak-box{
+    margin-top:22px; background:var(--paper-dark); border:1px solid var(--line);
+    border-radius:4px; padding:14px 16px;
+  }
+  .weak-box h2{
+    font-family:'Shippori Mincho', serif; font-size:14px; margin:0 0 8px;
+  }
+  .weak-item{
+    display:flex; justify-content:space-between; font-size:12.5px;
+    padding:5px 0; border-bottom:1px dotted var(--line); color:var(--ink-soft);
+  }
+  .weak-item:last-child{border-bottom:none;}
+  .weak-item b{color:var(--red);}
+
+  .opt-row{ margin:2px 0 12px; }
+  .opt-toggle{
+    display:flex; align-items:center; gap:8px;
+    font-size:12.5px; color:var(--ink-soft); cursor:pointer; user-select:none;
+  }
+  .opt-toggle input{ accent-color:var(--ink); width:15px; height:15px; }
+
+  .sync-box{
+    margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  .sync-btn{
+    font-family:'Zen Kaku Gothic New', sans-serif; font-size:11.5px;
+    padding:7px 10px; background:var(--paper); border:1px solid var(--line);
+    color:var(--ink-soft); border-radius:3px; cursor:pointer;
+  }
+  .sync-btn:active{ background:var(--paper-dark); }
+  .sync-area{
+    width:100%; margin-top:2px; font-family:'Space Mono', monospace; font-size:10.5px;
+    padding:8px; border:1px solid var(--line); border-radius:3px; background:#FBF8EF; color:var(--ink);
+    resize:vertical;
+  }
+  .sync-msg{ font-size:11px; color:var(--moss); }
+
+  footer{
+    text-align:center; margin-top:26px; font-size:10.5px; color:var(--ink-soft);
+    font-family:'Space Mono', monospace;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">FRAMEWORK DRILL</div>
+    <h1>頭文字フレームワークドリル</h1>
+    <div class="sub">事例Ⅱの「ダナドコ」「けちのしぶき」「施策あるある5」を一問一答で。</div>
+  </header>
+
+  <div class="tape">
+    <div class="tape-row">
+      <span id="tapeMarks" class="tape-marks">まだ記録がありません</span>
+      <span id="tapeRate" class="tape-rate">--%</span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="opt-row">
+    <label class="opt-toggle"><input type="checkbox" id="weakOnlyToggle"> 苦手優先モード（習得済み[連続2回正解]の問題を除外）</label>
+  </div>
+
+  <div class="session-row">
+    <div class="sbtn" data-n="5"><b>5問</b><span>約3分</span></div>
+    <div class="sbtn" data-n="10"><b>10問</b><span>約5〜7分</span></div>
+    <div class="sbtn" data-n="99"><b>全問</b><span>カテゴリ集中</span></div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="weak-box" id="weakBox" style="display:none;">
+    <h2>苦手リスト（正答率が低い順）</h2>
+    <div id="weakList"></div>
+  </div>
+
+  <div class="sync-box">
+    <button class="sync-btn" id="exportBtn">📤 進捗をエクスポート</button>
+    <button class="sync-btn" id="importBtn">📥 進捗をインポート</button>
+    <textarea class="sync-area" id="syncArea" style="display:none;" rows="3" placeholder="ここに進捗JSONを貼り付けて「読み込む」を押す"></textarea>
+    <button class="sync-btn" id="syncApplyBtn" style="display:none;">読み込む</button>
+    <span class="sync-msg" id="syncMsg"></span>
+  </div>
+
+  <footer>頭文字フレームワーク集をもとに作成 &middot; 記録は端末(localStorage)に保存されます。新しいバージョンをもらったら「進捗をエクスポート」→次のバージョンで「進捗をインポート」で引き継げます。</footer>
+</div>
+
+<script>
+// ---------------- Question bank ----------------
+const BANK = [
+  // ダナドコ基礎
+  {cat:'danadoko', q:'ダナドコとは何の頭文字か？', a:'誰に・何を・どのように・効果', tip:'事例Ⅱの助言問題における解答骨格。'},
+  {cat:'danadoko', q:'設問文にダナドコの要素（例：ターゲット）が既に明示されている場合の対応は？', a:'重複を避けるため、その要素は解答に書かなくてよい（文字数対策）', tip:''},
+  {cat:'danadoko', q:'「誰に」（ターゲット）を検討する4つの切り口は？', a:'デモ（人口動態的変数）・ジオ（地理的変数）・サイコ（心理的変数）・行動変数', tip:''},
+  {cat:'danadoko', q:'「どのように」を書く際に使う基本フレームは？', a:'4P（Product製品・Price価格・Place チャネル・Promotion販促）', tip:''},
+  {cat:'danadoko', q:'「効果」を書く際に意識すべき基本方向性は？', a:'売上向上、または与件文の弱み・脅威の解消につなげる', tip:''},
+
+  // けちのしぶき／経営資源
+  {cat:'kechi', q:'強み（経営資源）を洗い出す語呂合わせ「けちのしぶき」の7要素は？', a:'経験・知識・ノウハウ・こだわり・信頼・ブランド・技術', tip:''},
+  {cat:'kechi', q:'「けちのしぶき」は主にダナドコのどの要素の根拠出しに使うか？', a:'「誰に」「どのように」を書く際の自社の強みの特定', tip:''},
+
+  // 施策あるある5（サ・タカ・ブ・カン・クチ）
+  {cat:'sakusaku', q:'事例Ⅱ施策あるある5の並び順（因果の流れ）は？', a:'差別化 → 高付加価値化 → ブランド化 → 関係性強化 → 口コミ・紹介', tip:'差別化した強みが付加価値を生み、ブランドとして認知され、関係が深まり口コミが広がる流れ。'},
+  {cat:'sakusaku', q:'与件文に「価格競争が激化している」とあれば、まず疑う施策あるあるは？', a:'差別化', tip:''},
+  {cat:'sakusaku', q:'与件文に「客単価が伸び悩んでいる／安売りをしている」とあれば？', a:'高付加価値化', tip:''},
+  {cat:'sakusaku', q:'与件文に「知名度が低い／認知度不足」とあれば？', a:'ブランド化', tip:''},
+  {cat:'sakusaku', q:'与件文に「新規顧客は獲得できるがリピートに繋がらない」とあれば？', a:'関係性強化（固定客化）', tip:''},
+  {cat:'sakusaku', q:'与件文に「満足度は高いが紹介や口コミが少ない」とあれば？', a:'口コミ・紹介', tip:''},
+  {cat:'sakusaku', q:'施策あるある5と4Pの役割の違いは？', a:'4Pは「どのように（手段）」の切り口、施策あるある5は「効果・着地点」の切り口。両者は補完関係にある', tip:''},
+];
+
+const CAT_LABELS = {
+  all:'全部', danadoko:'ダナドコ', kechi:'けちのしぶき', sakusaku:'施策あるある5'
+};
+
+// ---------------- State ----------------
+let currentCat = 'all';
+let session = [];
+let sIndex = 0;
+let sScore = 0;
+let revealed = false;
+let stats = {}; // { "cat|q": {correct, total} }
+let weakOnly = false;
+
+const STORAGE_KEY = 'framework-drill-stats';
+const WEAKONLY_KEY = 'framework-drill-weakonly';
+
+const stage = document.getElementById('stage');
+const tabsEl = document.getElementById('tabs');
+const weakBox = document.getElementById('weakBox');
+const weakList = document.getElementById('weakList');
+
+function keyFor(item){ return item.cat + '|' + item.q; }
+
+function isMastered(item){
+  const s = stats[keyFor(item)];
+  return !!(s && s.total >= 2 && s.correct === s.total);
+}
+
+function loadStats(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ stats = JSON.parse(raw); }
+  }catch(e){ stats = {}; }
+  try{ weakOnly = localStorage.getItem(WEAKONLY_KEY) === '1'; }catch(e){ weakOnly = false; }
+  renderTape();
+  renderWeak();
+}
+function saveStats(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stats)); }
+  catch(e){ /* storage unavailable, session-only fallback */ }
+}
+
+function renderTape(){
+  const entries = Object.values(stats);
+  if(entries.length === 0){
+    document.getElementById('tapeMarks').textContent = 'まだ記録がありません';
+    document.getElementById('tapeRate').textContent = '--%';
+    return;
+  }
+  let totalC=0, totalT=0;
+  entries.forEach(s=>{ totalC+=s.correct; totalT+=s.total; });
+  const rate = totalT? Math.round(totalC/totalT*100) : 0;
+  const log = (window.__drillLog || []).slice(-14);
+  const marks = log.map(x=> x ? '<span class="ok">○</span>' : '<span class="ng">✕</span>').join(' ');
+  document.getElementById('tapeMarks').innerHTML = marks || '記録あり・履歴は今回のセッションから表示';
+  document.getElementById('tapeRate').textContent = '累計正答率 ' + rate + '%';
+}
+
+function renderWeak(){
+  const arr = Object.entries(stats)
+    .filter(([k,s]) => s.total >= 2)
+    .map(([k,s]) => ({key:k, q:k.split('|')[1], cat:k.split('|')[0], rate: s.correct/s.total, total:s.total}))
+    .sort((a,b)=> a.rate - b.rate)
+    .slice(0,5);
+  if(arr.length === 0){ weakBox.style.display='none'; return; }
+  weakBox.style.display='block';
+  weakList.innerHTML = arr.map(x=>`<div class="weak-item"><span>［${CAT_LABELS[x.cat]||x.cat}］${x.q}</span><b>${Math.round(x.rate*100)}%</b></div>`).join('');
+}
+
+function renderTabs(){
+  const cats = ['all', ...Array.from(new Set(BANK.map(b=>b.cat)))];
+  tabsEl.innerHTML = cats.map(c=>{
+    const cnt = c==='all' ? BANK.length : BANK.filter(b=>b.cat===c).length;
+    return `<div class="tab ${c===currentCat?'active':''}" data-cat="${c}">${CAT_LABELS[c]||c}<span class="cnt">(${cnt})</span></div>`;
+  }).join('');
+  tabsEl.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click', ()=>{ currentCat = t.dataset.cat; renderTabs(); });
+  });
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function startSession(n){
+  let pool = currentCat==='all' ? BANK : BANK.filter(b=>b.cat===currentCat);
+  if(weakOnly) pool = pool.filter(b=>!isMastered(b));
+  session = shuffle(pool).slice(0, Math.min(n, pool.length));
+  sIndex = 0; sScore = 0; revealed = false;
+  window.__drillLog = [];
+  renderCard();
+}
+
+function renderCard(){
+  if(sIndex >= session.length){
+    renderDone();
+    return;
+  }
+  const item = session[sIndex];
+  revealed = false;
+  stage.innerHTML = `
+    <div class="card">
+      <div class="card-top">
+        <span>${CAT_LABELS[item.cat]||item.cat}</span>
+        <span class="progress">${sIndex+1} / ${session.length}</span>
+      </div>
+      <div class="qlabel">Q.</div>
+      <div class="qtext">${item.q}</div>
+      <hr class="divider">
+      <div class="answer" id="ansBlock">
+        <div class="alabel">A.</div>
+        <div class="atext">${item.a}</div>
+        ${item.tip ? `<div class="tip">💡 ${item.tip}</div>` : ''}
+      </div>
+      <button class="reveal-btn" id="revealBtn">答えを見る</button>
+      <div class="judge-row" id="judgeRow" style="display:none;">
+        <div class="jbtn ok" id="okBtn">○ 正解できた</div>
+        <div class="jbtn ng" id="ngBtn">✕ 間違えた</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('revealBtn').addEventListener('click', ()=>{
+    document.getElementById('ansBlock').classList.add('show');
+    document.getElementById('revealBtn').style.display='none';
+    document.getElementById('judgeRow').style.display='flex';
+  });
+  document.getElementById('okBtn').addEventListener('click', ()=> judge(true));
+  document.getElementById('ngBtn').addEventListener('click', ()=> judge(false));
+}
+
+function judge(correct){
+  const item = session[sIndex];
+  const k = keyFor(item);
+  if(!stats[k]) stats[k] = {correct:0, total:0};
+  stats[k].total += 1;
+  if(correct){ stats[k].correct += 1; sScore += 1; }
+  window.__drillLog.push(correct);
+  saveStats();
+  renderTape();
+  sIndex += 1;
+  renderCard();
+}
+
+function renderDone(){
+  renderWeak();
+  stage.innerHTML = `
+    <div class="card done-card">
+      <div class="eyebrow" style="margin-bottom:10px;">SESSION COMPLETE</div>
+      <div class="big">${sScore} / ${session.length}</div>
+      <p>お疲れさまでした。また隙間時間にどうぞ。</p>
+      <button class="restart" id="restartBtn">もう一度（同じ条件で）</button>
+    </div>
+  `;
+  document.getElementById('restartBtn').addEventListener('click', ()=>{
+    const n = session.length;
+    startSession(n >= BANK.length ? 99 : n);
+  });
+}
+
+// ---------------- Init ----------------
+renderTabs();
+loadStats();
+stage.innerHTML = `
+  <div class="card done-card">
+    <div class="eyebrow" style="margin-bottom:10px;">READY</div>
+    <div style="font-family:'Shippori Mincho',serif; font-size:16px; margin:8px 0 4px;">カテゴリを選んで、問題数を選択</div>
+    <p>フレームワークの頭文字・要素・使いどころを中心に出題します。</p>
+  </div>
+`;
+document.querySelectorAll('.sbtn').forEach(b=>{
+  b.addEventListener('click', ()=> startSession(parseInt(b.dataset.n,10)));
+});
+
+const weakOnlyToggle = document.getElementById('weakOnlyToggle');
+weakOnlyToggle.checked = weakOnly;
+weakOnlyToggle.addEventListener('change', ()=>{
+  weakOnly = weakOnlyToggle.checked;
+  try{ localStorage.setItem(WEAKONLY_KEY, weakOnly ? '1' : '0'); }catch(e){}
+});
+
+const syncArea = document.getElementById('syncArea');
+const syncApplyBtn = document.getElementById('syncApplyBtn');
+const syncMsg = document.getElementById('syncMsg');
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  syncArea.value = JSON.stringify(stats);
+  syncArea.style.display = 'block';
+  syncApplyBtn.style.display = 'none';
+  syncArea.focus();
+  syncArea.select();
+  syncMsg.textContent = '';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(syncArea.value)
+      .then(()=>{ syncMsg.textContent = 'コピーしました。新しいバージョンの「進捗をインポート」に貼り付けてください。'; })
+      .catch(()=>{ syncMsg.textContent = '下のテキストを選択してコピーしてください。'; });
+  }else{
+    syncMsg.textContent = '下のテキストを選択してコピーしてください。';
+  }
+});
+
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  syncArea.value = '';
+  syncArea.style.display = 'block';
+  syncApplyBtn.style.display = 'inline-block';
+  syncArea.focus();
+  syncMsg.textContent = '';
+});
+
+syncApplyBtn.addEventListener('click', ()=>{
+  try{
+    const imported = JSON.parse(syncArea.value);
+    stats = Object.assign({}, stats, imported);
+    saveStats();
+    renderTape();
+    renderWeak();
+    syncMsg.textContent = '読み込みました（' + Object.keys(imported).length + '件）。';
+  }catch(e){
+    syncMsg.textContent = '読み込みに失敗しました。JSONの形式を確認してください。';
+  }
+});
+</script>
+</body>
+</html>
