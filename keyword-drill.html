@@ -44,6 +44,12 @@
  }
  .sub{ font-size:12.5px; color:var(--ink-soft); }
 
+ .back-link{
+ display:inline-block; font-family:'Space Mono', monospace; font-size:11px;
+ color:var(--ink-soft); text-decoration:none; margin-bottom:10px;
+ }
+ .back-link:active{ color:var(--ink); }
+
  .tape{
  margin-top:14px; background:#FBF8EF; border:1px solid var(--line); border-radius:2px;
  padding:10px 12px; font-family:'Space Mono', monospace; font-size:13px;
@@ -185,6 +191,7 @@
 <div class="wrap">
 
  <header>
+ <a class="back-link" href="index.html">← ドリル一覧に戻る</a>
  <div class="eyebrow">KEYWORD MAPPING DRILL</div>
  <h1>課題→対応策キーワード変換</h1>
  <div class="sub">与件文の状況を見て、飛躍せず想定できる対応策を思い出す練習。</div>
@@ -201,6 +208,9 @@
 
  <div class="opt-row">
  <label class="opt-toggle"><input type="checkbox" id="weakOnlyToggle"> 苦手優先モード（習得済み[連続2回正解]の問題を除外）</label>
+ </div>
+ <div class="opt-row">
+ <label class="opt-toggle"><input type="checkbox" id="newestFirstToggle"> 新しい問題から解く（追加順・シャッフルなし）</label>
  </div>
 
  <div class="session-row">
@@ -316,9 +326,11 @@ let sIndex = 0;
 let sScore = 0;
 let stats = {};
 let weakOnly = false;
+let newestFirst = false;
 
 const STORAGE_KEY = 'keyword-mapping-stats';
 const WEAKONLY_KEY = 'keyword-mapping-weakonly';
+const NEWESTFIRST_KEY = 'keyword-mapping-newestfirst';
 
 const stage = document.getElementById('stage');
 const tabsEl = document.getElementById('tabs');
@@ -338,6 +350,7 @@ function loadStats(){
  if(raw){ stats = JSON.parse(raw); }
  }catch(e){ stats = {}; }
  try{ weakOnly = localStorage.getItem(WEAKONLY_KEY) === '1'; }catch(e){ weakOnly = false; }
+ try{ newestFirst = localStorage.getItem(NEWESTFIRST_KEY) === '1'; }catch(e){ newestFirst = false; }
  renderTape();
  renderWeak();
 }
@@ -396,7 +409,7 @@ function shuffle(arr){
 function startSession(n){
  let pool = currentCat==='all' ? BANK : BANK.filter(b=>b.cat===currentCat);
  if(weakOnly) pool = pool.filter(b=>!isMastered(b));
- session = shuffle(pool).slice(0, Math.min(n, pool.length));
+ session = newestFirst ? pool.slice(-n).reverse() : shuffle(pool).slice(0, Math.min(n, pool.length));
  sIndex = 0; sScore = 0;
  window.__drillLog = [];
  renderCard();
@@ -489,6 +502,13 @@ weakOnlyToggle.checked = weakOnly;
 weakOnlyToggle.addEventListener('change', ()=>{
  weakOnly = weakOnlyToggle.checked;
  try{ localStorage.setItem(WEAKONLY_KEY, weakOnly ? '1' : '0'); }catch(e){}
+});
+
+const newestFirstToggle = document.getElementById('newestFirstToggle');
+newestFirstToggle.checked = newestFirst;
+newestFirstToggle.addEventListener('change', ()=>{
+ newestFirst = newestFirstToggle.checked;
+ try{ localStorage.setItem(NEWESTFIRST_KEY, newestFirst ? '1' : '0'); }catch(e){}
 });
 
 const syncArea = document.getElementById('syncArea');
