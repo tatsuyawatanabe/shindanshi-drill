@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>簡潔表現・圧縮ドリル</title>
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+ :root{
+ --paper:#F5EFE1;
+ --paper-dark:#EDE4CE;
+ --line:#CFC3A3;
+ --ink:#26314A;
+ --ink-soft:#5B5747;
+ --accent:#7A4B3A;
+ --moss:#4B6B4E;
+ --gold:#B08A3E;
+ --card-shadow: 0 1px 0 rgba(38,49,74,0.06);
+ }
+
+ *{box-sizing:border-box;}
+ html,body{margin:0;padding:0;}
+ body{
+ background:
+ repeating-linear-gradient(180deg, transparent, transparent 27px, var(--line) 28px),
+ var(--paper);
+ color:var(--ink);
+ font-family:'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+ min-height:100vh;
+ padding:18px 14px 60px;
+ }
+
+ .wrap{max-width:480px; margin:0 auto;}
+
+ header{ text-align:center; padding:6px 0 14px; }
+ .eyebrow{
+ font-family:'Space Mono', monospace;
+ font-size:11px; letter-spacing:.18em; color:var(--gold); text-transform:uppercase;
+ }
+ h1{
+ font-family:'Shippori Mincho', serif; font-weight:700; font-size:23px;
+ margin:4px 0 2px; color:var(--ink);
+ }
+ .sub{ font-size:12.5px; color:var(--ink-soft); }
+
+ .back-link{
+ display:inline-block; font-family:'Space Mono', monospace; font-size:11px;
+ color:var(--ink-soft); text-decoration:none; margin-bottom:10px;
+ }
+ .back-link:active{ color:var(--ink); }
+
+ .tape{
+ margin-top:14px; background:#FBF8EF; border:1px solid var(--line); border-radius:2px;
+ padding:10px 12px; font-family:'Space Mono', monospace; font-size:13px;
+ color:var(--ink-soft); position:relative; box-shadow: var(--card-shadow);
+ }
+ .tape::before, .tape::after{
+ content:""; position:absolute; left:0; right:0; height:6px;
+ background-image: linear-gradient(45deg, var(--paper) 50%, transparent 50%), linear-gradient(-45deg, var(--paper) 50%, transparent 50%);
+ background-size: 10px 6px; background-repeat:repeat-x;
+ }
+ .tape::before{ top:-6px; background-position: 0 6px;}
+ .tape::after{ bottom:-6px; transform:rotate(180deg);}
+ .tape-row{display:flex; justify-content:space-between; align-items:center;}
+ .tape-marks{letter-spacing:3px; font-size:15px;}
+ .tape-marks .ok{color:var(--moss);}
+ .tape-marks .ng{color:#A23B2E;}
+ .tape-rate{font-weight:700; color:var(--ink);}
+
+ .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 10px; }
+ .tab{
+ font-size:12.5px; padding:6px 10px; border:1px solid var(--line);
+ background:var(--paper-dark); color:var(--ink-soft); border-radius:3px;
+ cursor:pointer; user-select:none; transition:all .15s ease;
+ }
+ .tab.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+ .tab .cnt{opacity:.65; font-size:10.5px; margin-left:2px;}
+
+ .session-row{display:flex; gap:8px; margin:6px 0 18px;}
+ .sbtn{
+ flex:1; font-family:'Space Mono', monospace; font-size:13px; padding:10px 4px;
+ text-align:center; background:var(--paper); border:1px solid var(--ink); color:var(--ink);
+ border-radius:3px; cursor:pointer;
+ }
+ .sbtn:active{ background:var(--ink); color:var(--paper); }
+ .sbtn b{display:block; font-size:16px;}
+ .sbtn span{font-size:9.5px; color:var(--ink-soft); font-family:'Zen Kaku Gothic New',sans-serif;}
+
+ .stage{ min-height:360px; }
+ .card{
+ background:#FBF8EF; border:1px solid var(--line); border-radius:4px;
+ padding:22px 20px 18px; box-shadow: var(--card-shadow); position:relative;
+ }
+ .card-top{
+ display:flex; justify-content:space-between; align-items:center;
+ font-family:'Space Mono', monospace; font-size:11px; color:var(--gold);
+ letter-spacing:.06em; margin-bottom:14px;
+ }
+ .progress{ font-size:11px; color:var(--ink-soft); }
+ .qlabel{ font-family:'Space Mono', monospace; font-size:11px; color:var(--ink-soft); margin-bottom:6px; }
+ .qtext{
+ font-family:'Shippori Mincho', serif; font-size:17px; line-height:1.7;
+ color:var(--ink); min-height:50px;
+ }
+ .qlen{ font-family:'Space Mono', monospace; font-size:11px; color:var(--ink-soft); margin-top:6px; }
+ .divider{ border:none; border-top:1px dashed var(--line); margin:16px 0; }
+ .answer{ display:none; }
+ .answer.show{ display:block; }
+ .alabel{ font-family:'Space Mono', monospace; font-size:11px; color:var(--accent); margin-bottom:8px; }
+ .kw-block{
+ background:var(--paper-dark); border-left:3px solid var(--accent); padding:10px 12px;
+ border-radius:2px; margin-bottom:8px;
+ }
+ .kw-block .tag{ font-size:10.5px; color:var(--ink-soft); margin-bottom:3px; }
+ .kw-block .val{ font-size:15px; color:var(--ink); font-weight:700; }
+ .kw-block .savings{ font-size:11px; color:var(--moss); margin-top:4px; font-family:'Space Mono', monospace; }
+ .why-block{
+ background:var(--paper-dark); border-left:3px solid var(--moss); padding:10px 12px;
+ border-radius:2px;
+ }
+ .why-block .tag{ font-size:10.5px; color:var(--ink-soft); margin-bottom:3px; }
+ .why-block .val{ font-size:14px; color:var(--ink); line-height:1.6; }
+
+ .reveal-btn{
+ width:100%; margin-top:16px; background:var(--ink); color:var(--paper);
+ border:none; border-radius:3px; padding:13px; font-size:14px; font-weight:700;
+ font-family:'Zen Kaku Gothic New', sans-serif; cursor:pointer;
+ }
+ .judge-row{ display:flex; gap:10px; margin-top:14px; }
+ .jbtn{
+ flex:1; padding:12px; border-radius:3px; border:1px solid var(--line);
+ font-size:14px; font-weight:700; cursor:pointer;
+ font-family:'Zen Kaku Gothic New', sans-serif; background:var(--paper);
+ }
+ .jbtn.ok{ color:var(--moss); border-color:var(--moss); }
+ .jbtn.ng{ color:#A23B2E; border-color:#A23B2E; }
+ .jbtn.ok:active{ background:var(--moss); color:#fff; }
+ .jbtn.ng:active{ background:#A23B2E; color:#fff; }
+
+ .done-card{ text-align:center; padding:36px 20px; }
+ .done-card .big{ font-family:'Space Mono', monospace; font-size:34px; font-weight:700; color:var(--ink); }
+ .done-card p{ color:var(--ink-soft); font-size:13px; margin-top:6px;}
+ .restart{
+ margin-top:18px; width:100%; background:var(--paper); border:1px solid var(--ink); color:var(--ink);
+ padding:12px; border-radius:3px; font-weight:700; cursor:pointer;
+ font-family:'Zen Kaku Gothic New', sans-serif;
+ }
+
+ .weak-box{
+ margin-top:22px; background:var(--paper-dark); border:1px solid var(--line);
+ border-radius:4px; padding:14px 16px;
+ }
+ .weak-box h2{ font-family:'Shippori Mincho', serif; font-size:14px; margin:0 0 8px; }
+ .weak-item{
+ display:flex; justify-content:space-between; font-size:12px;
+ padding:5px 0; border-bottom:1px dotted var(--line); color:var(--ink-soft);
+ }
+ .weak-item:last-child{border-bottom:none;}
+ .weak-item b{color:#A23B2E;}
+
+ .opt-row{ margin:2px 0 12px; }
+ .opt-toggle{
+ display:flex; align-items:center; gap:8px;
+ font-size:12.5px; color:var(--ink-soft); cursor:pointer; user-select:none;
+ }
+ .opt-toggle input{ accent-color:var(--ink); width:15px; height:15px; }
+
+ .sync-box{
+ margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+ display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+ }
+ .sync-btn{
+ font-family:'Zen Kaku Gothic New', sans-serif; font-size:11.5px;
+ padding:7px 10px; background:var(--paper); border:1px solid var(--line);
+ color:var(--ink-soft); border-radius:3px; cursor:pointer;
+ }
+ .sync-btn:active{ background:var(--paper-dark); }
+ .sync-area{
+ width:100%; margin-top:2px; font-family:'Space Mono', monospace; font-size:10.5px;
+ padding:8px; border:1px solid var(--line); border-radius:3px; background:#FBF8EF; color:var(--ink);
+ resize:vertical;
+ }
+ .sync-msg{ font-size:11px; color:var(--moss); }
+
+ footer{
+ text-align:center; margin-top:26px; font-size:10.5px; color:var(--ink-soft);
+ font-family:'Space Mono', monospace;
+ }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+ <header>
+ <a class="back-link" href="index.html">← ドリル一覧に戻る</a>
+ <div class="eyebrow">COMPRESSION DRILL</div>
+ <h1>簡潔表現・圧縮ドリル</h1>
+ <div class="sub">冗長な言い回しを見て、意味を保ったまま短く言い換える練習。「固定客化」等の着地ワードを書く字数を作る。</div>
+ </header>
+
+ <div class="tape">
+ <div class="tape-row">
+ <span id="tapeMarks" class="tape-marks">まだ記録がありません</span>
+ <span id="tapeRate" class="tape-rate">--%</span>
+ </div>
+ </div>
+
+ <div class="tabs" id="tabs"></div>
+
+ <div class="opt-row">
+ <label class="opt-toggle"><input type="checkbox" id="weakOnlyToggle"> 苦手優先モード（習得済み[連続2回正解]の問題を除外）</label>
+ </div>
+ <div class="opt-row">
+ <label class="opt-toggle"><input type="checkbox" id="newestFirstToggle"> 新しい問題から解く（追加順・シャッフルなし）</label>
+ </div>
+
+ <div class="session-row">
+ <div class="sbtn" data-n="5"><b>5問</b><span>約3分</span></div>
+ <div class="sbtn" data-n="10"><b>10問</b><span>約5〜7分</span></div>
+ <div class="sbtn" data-n="99"><b>全問</b><span>事例集中</span></div>
+ </div>
+
+ <div class="stage" id="stage"></div>
+
+ <div class="weak-box" id="weakBox" style="display:none;">
+ <h2>苦手リスト（正答率が低い順）</h2>
+ <div id="weakList"></div>
+ </div>
+
+ <div class="sync-box">
+ <button class="sync-btn" id="exportBtn">📤 進捗をエクスポート</button>
+ <button class="sync-btn" id="importBtn">📥 進捗をインポート</button>
+ <textarea class="sync-area" id="syncArea" style="display:none;" rows="3" placeholder="ここに進捗JSONを貼り付けて「読み込む」を押す"></textarea>
+ <button class="sync-btn" id="syncApplyBtn" style="display:none;">読み込む</button>
+ <span class="sync-msg" id="syncMsg"></span>
+ </div>
+
+ <footer>冗長表現→簡潔表現の言い換えトレーニング用オリジナル例文 &middot; 記録は端末(localStorage)に保存されます。新しいバージョンをもらったら「進捗をエクスポート」→次のバージョンで「進捗をインポート」で引き継げます。</footer>
+</div>
+
+<script>
+// ---------------- Question bank ----------------
+const BANK = [
+ // 共通・定番の圧縮テク
+ {cat:'gen', before:'〜することによって、〜を実現する', after:'〜し、〜を実現する', tip:'「〜することによって」は「〜し」（て形）で十分つながる。原因・手段を説明する接続語を削れる定番パターン。'},
+ {cat:'gen', before:'〜という状況が生じている', after:'〜している', tip:'「〜という状況が生じている」は事実をわざわざ名詞化して説明しているだけ。動詞一つ「〜している」に戻せる。'},
+ {cat:'gen', before:'〜することを通じて、〜につなげる', after:'〜し、〜化する', tip:'「〜につなげる」を体言止め（例：固定客化・効率化）にすると、動詞句を1語に圧縮できる。'},
+ {cat:'gen', before:'〜するとともに、〜も併せて実施する', after:'〜し、〜も行う', tip:'「〜するとともに」「併せて実施する」は同じ「並列」を二重に言っている。て形＋「も行う」で足りる。'},
+ {cat:'gen', before:'〜という点が課題となっている', after:'〜が課題である', tip:'「という点が」「〜となっている」はどちらも意味を持たない飾り。名詞＋「が課題である」まで削れる。'},
+ {cat:'gen', before:'〜することが可能となる', after:'〜できる', tip:'「〜することが可能となる」はほぼ全てのケースで「〜できる」に置き換えられる。可能表現の遠回し言い方。'},
+ {cat:'gen', before:'〜を図ることによって対応する', after:'〜を図る', tip:'「対応する」は「図る」の意味にすでに含まれていることが多い二重表現。片方を削る。'},
+ {cat:'gen', before:'〜していくことが求められる', after:'〜する', tip:'「〜ていく」「求められる」はどちらも弱めのぼかし表現。言い切り「〜する」にするだけで文意は変わらず縮む。'},
+ {cat:'gen', before:'〜させるようにする', after:'〜させる', tip:'「〜ようにする」は使役・意図をぼかして重ねているだけ。使役形単独で意味は変わらない。'},
+ {cat:'gen', before:'〜することが重要であると考えられる', after:'〜すべきである', tip:'「〜と考えられる」という推測の弱め表現をやめて断定形にする。解答は助言なので言い切ってよい。'},
+
+ // 事例Ⅱ：マーケティング（固定客化の字数を作る）
+ {cat:'j2', before:'新規顧客を獲得し、その後も継続的に来店してもらうことで固定客化を図る', after:'新規顧客を獲得し固定客化を図る', tip:'「その後も継続的に来店してもらうことで」は「固定客化」という語の定義そのものを説明しているだけで意味が重複。定義の言い換えを削り結論語だけ残す。'},
+ {cat:'j2', before:'商品の情報を発信し、認知度を高めることで新規顧客の獲得につなげる', after:'商品情報を発信し新規顧客の獲得と固定客化につなげる', tip:'「認知度を高めることで」を削って浮いた字数を、本来書きたかった「固定客化」の追加にあてる。圧縮は削るだけでなく、空いた字数の再配分とセット。'},
+ {cat:'j2', before:'顧客との関係を強化し、継続的に利用してもらえるようにする', after:'顧客との関係を強化し固定客化を図る', tip:'「継続的に利用してもらえるようにする」は丸ごと「固定客化」1語に置き換えられる説明文。専門用語（着地ワード）を知っていれば大幅に縮む。'},
+ {cat:'j2', before:'会員制度を導入して顧客の情報を管理し、個別に提案を行う', after:'会員制度で顧客情報を管理し個別提案を行う', tip:'「〜を行う」を動詞のまま残さず「個別提案」という複合名詞にすると、助詞1つ分縮む。名詞化（体言止め）は圧縮の基本技。'},
+ {cat:'j2', before:'SNSを使って情報を発信することにより、双方向のコミュニケーションを生み出す', after:'SNSで双方向発信し顧客の反応を集める', tip:'「情報を発信することにより」「コミュニケーションを生み出す」を「双方向発信」という1語に統合。効果（反応を集める）まで字数内に収められる。'},
+ {cat:'j2', before:'価格を明確に提示することで、購入への心理的なハードルを下げる', after:'価格を明示し購入のハードルを下げる', tip:'「明確に提示する」→「明示する」、「心理的な」は削っても意味は通じる（ハードルは元々心理的なものなので冗長）。'},
+
+ // 事例Ⅰ：組織・人事
+ {cat:'j1', before:'ノウハウを言語化し、文書として共有できるようにする', after:'ノウハウを形式知化・共有する', tip:'「言語化し文書として共有できるようにする」は事例Ⅰ頻出の専門用語「形式知化」1語で置き換えられる。用語を知っているかどうかが圧縮効率を左右する。'},
+ {cat:'j1', before:'権限を委譲することによって、意思決定のスピードを速める', after:'権限委譲により意思決定を迅速化する', tip:'「権限を委譲する」→「権限委譲」（動詞の名詞化）、「スピードを速める」→「迅速化する」で二重に圧縮できる。'},
+ {cat:'j1', before:'評価の基準を明確にすることで、従業員の納得感を高める', after:'評価基準を明確化し納得感を高める', tip:'「評価の基準」→「評価基準」（助詞「の」を削り複合語化）、「明確にする」→「明確化する」の2箇所で縮む。'},
+ {cat:'j1', before:'教育の体制を整備することを通じて、技術の継承を図る', after:'教育体制を整備し技術継承を図る', tip:'「〜の」を挟む2語（教育の体制／技術の継承）はどちらも複合名詞（教育体制／技術継承）にできる。「の」の削除は圧縮の初手。'},
+
+ // 事例Ⅲ：生産・技術
+ {cat:'j3', before:'作業の手順を標準化することによって、品質のばらつきを抑える', after:'作業手順を標準化し品質のばらつきを抑える', tip:'「作業の手順」→「作業手順」。事例Ⅲは複合名詞（生産計画・検査記録・多能工化等）の宝庫なので「の」を削れないか毎回疑う。'},
+ {cat:'j3', before:'生産の計画を一元的に管理できるようにする', after:'生産計画を一元管理する', tip:'「一元的に管理できるようにする」は「一元管理する」で言い切れる。可能形＋ぼかし表現の二重構造を解く。'},
+ {cat:'j3', before:'検査の記録をデータベース化して、いつでも確認できるようにする', after:'検査記録をDB化し即時確認を可能にする', tip:'「データベース化」は略語「DB化」で縮む（本試験の解答でも略語は一般的に許容される）。「いつでも確認できるようにする」→「即時確認を可能にする」で言い換え。'},
+ {cat:'j3', before:'多能工化を進めることによって、柔軟な人員配置を可能にする', after:'多能工化により柔軟な人員配置を可能にする', tip:'「〜を進めることによって」は「〜により」だけで因果関係が伝わる。手段を表す語がすでに名詞（多能工化）なら「進める」は不要になりやすい。'},
+
+ // 事例Ⅳ：記述問題
+ {cat:'j4', before:'支出済みであり、かつどの案を採用しても金額が変わらない費用であるため、意思決定には含めない', after:'支出済みで案によらず不変のため意思決定に含めない', tip:'「どの案を採用しても金額が変わらない」→「案によらず不変」で大幅圧縮。埋没費用の3点セット説明は特に長くなりがちなので圧縮技が要る。'},
+ {cat:'j4', before:'利益は少ないが、固定費の回収に貢献しているため、事業を継続すべきである', after:'限界利益で固定費回収に貢献するため継続すべき', tip:'「固定費の回収に貢献している」→「固定費回収に貢献」で「の」「して」を削る。主張の核（限界利益がプラス）を先頭に置くと説得力も上がる。'},
+ {cat:'j4', before:'指標の数値が低下しているが、これは財務的に良い方向への変化である', after:'指標低下は財務的に良化を意味する', tip:'「良い方向への変化」は「良化」という1語（や「改善」）に置き換えられる。増減の評価を表す語彙を知っていると一気に縮む。'},
+ {cat:'j4', before:'自己資本比率が低いのは、借入への依存度が高いことが原因である', after:'自己資本比率低下は借入依存度の高さが原因', tip:'「〜への依存度が高いこと」→「〜依存度の高さ」で名詞化。原因・結果の説明文はどちらの節も名詞化できないか確認する。'},
+];
+
+const CAT_LABELS = { all:'全部', gen:'共通', j1:'事例Ⅰ', j2:'事例Ⅱ', j3:'事例Ⅲ', j4:'事例Ⅳ' };
+
+// ---------------- State ----------------
+let currentCat = 'all';
+let session = [];
+let sIndex = 0;
+let sScore = 0;
+let stats = {};
+let weakOnly = false;
+let newestFirst = false;
+
+const STORAGE_KEY = 'compress-drill-stats';
+const WEAKONLY_KEY = 'compress-drill-weakonly';
+const NEWESTFIRST_KEY = 'compress-drill-newestfirst';
+
+const stage = document.getElementById('stage');
+const tabsEl = document.getElementById('tabs');
+const weakBox = document.getElementById('weakBox');
+const weakList = document.getElementById('weakList');
+
+function keyFor(item){ return item.cat + '|' + item.before.slice(0,14); }
+
+function isMastered(item){
+ const s = stats[keyFor(item)];
+ return !!(s && s.total >= 2 && s.correct === s.total);
+}
+
+function loadStats(){
+ try{
+ const raw = localStorage.getItem(STORAGE_KEY);
+ if(raw){ stats = JSON.parse(raw); }
+ }catch(e){ stats = {}; }
+ try{ weakOnly = localStorage.getItem(WEAKONLY_KEY) === '1'; }catch(e){ weakOnly = false; }
+ try{ newestFirst = localStorage.getItem(NEWESTFIRST_KEY) === '1'; }catch(e){ newestFirst = false; }
+ renderTape();
+ renderWeak();
+}
+function saveStats(){
+ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stats)); }
+ catch(e){ /* storage unavailable, session-only fallback */ }
+}
+
+function renderTape(){
+ const entries = Object.values(stats);
+ if(entries.length === 0){
+ document.getElementById('tapeMarks').textContent = 'まだ記録がありません';
+ document.getElementById('tapeRate').textContent = '--%';
+ return;
+ }
+ let totalC=0, totalT=0;
+ entries.forEach(s=>{ totalC+=s.correct; totalT+=s.total; });
+ const rate = totalT? Math.round(totalC/totalT*100) : 0;
+ const log = (window.__drillLog || []).slice(-14);
+ const marks = log.map(x=> x ? '<span class="ok">○</span>' : '<span class="ng">✕</span>').join(' ');
+ document.getElementById('tapeMarks').innerHTML = marks || '記録あり・履歴は今回のセッションから表示';
+ document.getElementById('tapeRate').textContent = '累計正答率 ' + rate + '%';
+}
+
+function renderWeak(){
+ const arr = Object.entries(stats)
+ .filter(([k,s]) => s.total >= 2)
+ .map(([k,s]) => ({key:k, rate: s.correct/s.total, total:s.total, label:s.label||k}))
+ .sort((a,b)=> a.rate - b.rate)
+ .slice(0,5);
+ if(arr.length === 0){ weakBox.style.display='none'; return; }
+ weakBox.style.display='block';
+ weakList.innerHTML = arr.map(x=>`<div class="weak-item"><span>${x.label}</span><b>${Math.round(x.rate*100)}%</b></div>`).join('');
+}
+
+function renderTabs(){
+ const cats = ['all','gen','j1','j2','j3','j4'];
+ tabsEl.innerHTML = cats.map(c=>{
+ const cnt = c==='all' ? BANK.length : BANK.filter(b=>b.cat===c).length;
+ return `<div class="tab ${c===currentCat?'active':''}" data-cat="${c}">${CAT_LABELS[c]}<span class="cnt">(${cnt})</span></div>`;
+ }).join('');
+ tabsEl.querySelectorAll('.tab').forEach(t=>{
+ t.addEventListener('click', ()=>{ currentCat = t.dataset.cat; renderTabs(); });
+ });
+}
+
+function shuffle(arr){
+ const a = arr.slice();
+ for(let i=a.length-1;i>0;i--){
+ const j = Math.floor(Math.random()*(i+1));
+ [a[i],a[j]] = [a[j],a[i]];
+ }
+ return a;
+}
+
+function startSession(n){
+ let pool = currentCat==='all' ? BANK : BANK.filter(b=>b.cat===currentCat);
+ if(weakOnly) pool = pool.filter(b=>!isMastered(b));
+ session = newestFirst ? pool.slice(-n).reverse() : shuffle(pool).slice(0, Math.min(n, pool.length));
+ sIndex = 0; sScore = 0;
+ window.__drillLog = [];
+ renderCard();
+}
+
+function renderCard(){
+ if(sIndex >= session.length){ renderDone(); return; }
+ const item = session[sIndex];
+ stage.innerHTML = `
+ <div class="card">
+ <div class="card-top">
+ <span>${CAT_LABELS[item.cat]}</span>
+ <span class="progress">${sIndex+1} / ${session.length}</span>
+ </div>
+ <div class="qlabel">冗長な表現</div>
+ <div class="qtext">${item.before}</div>
+ <div class="qlen">${item.before.length}字 → もっと短く言い換えるなら？</div>
+ <hr class="divider">
+ <div class="answer" id="ansBlock">
+ <div class="alabel">簡潔な言い換え</div>
+ <div class="kw-block">
+ <div class="tag">圧縮後</div>
+ <div class="val">${item.after}</div>
+ <div class="savings">${item.before.length}字 → ${item.after.length}字（${item.before.length - item.after.length}字圧縮）</div>
+ </div>
+ <div class="why-block">
+ <div class="tag">圧縮のコツ</div>
+ <div class="val">${item.tip}</div>
+ </div>
+ </div>
+ <button class="reveal-btn" id="revealBtn">言い換えを見る</button>
+ <div class="judge-row" id="judgeRow" style="display:none;">
+ <div class="jbtn ok" id="okBtn">○ 思いつけた</div>
+ <div class="jbtn ng" id="ngBtn">✕ 思いつけなかった</div>
+ </div>
+ </div>
+ `;
+ document.getElementById('revealBtn').addEventListener('click', ()=>{
+ document.getElementById('ansBlock').classList.add('show');
+ document.getElementById('revealBtn').style.display='none';
+ document.getElementById('judgeRow').style.display='flex';
+ });
+ document.getElementById('okBtn').addEventListener('click', ()=> judge(true));
+ document.getElementById('ngBtn').addEventListener('click', ()=> judge(false));
+}
+
+function judge(correct){
+ const item = session[sIndex];
+ const k = keyFor(item);
+ if(!stats[k]) stats[k] = {correct:0, total:0, label:'['+CAT_LABELS[item.cat]+']'+item.before.slice(0,16)+'…'};
+ stats[k].total += 1;
+ if(correct){ stats[k].correct += 1; sScore += 1; }
+ window.__drillLog.push(correct);
+ saveStats();
+ renderTape();
+ sIndex += 1;
+ renderCard();
+}
+
+function renderDone(){
+ renderWeak();
+ stage.innerHTML = `
+ <div class="card done-card">
+ <div class="eyebrow" style="margin-bottom:10px;">SESSION COMPLETE</div>
+ <div class="big">${sScore} / ${session.length}</div>
+ <p>お疲れさまでした。また隙間時間にどうぞ。</p>
+ <button class="restart" id="restartBtn">もう一度（同じ条件で）</button>
+ </div>
+ `;
+ document.getElementById('restartBtn').addEventListener('click', ()=>{
+ const n = session.length;
+ startSession(n >= BANK.length ? 99 : n);
+ });
+}
+
+// ---------------- Init ----------------
+renderTabs();
+loadStats();
+stage.innerHTML = `
+ <div class="card done-card">
+ <div class="eyebrow" style="margin-bottom:10px;">READY</div>
+ <div style="font-family:'Shippori Mincho',serif; font-size:16px; margin:8px 0 4px;">事例を選んで、問題数を選択</div>
+ <p>冗長な表現を読んで、意味を保ったまま短く言い換えられるか試します。</p>
+ </div>
+`;
+document.querySelectorAll('.sbtn').forEach(b=>{
+ b.addEventListener('click', ()=> startSession(parseInt(b.dataset.n,10)));
+});
+
+const weakOnlyToggle = document.getElementById('weakOnlyToggle');
+weakOnlyToggle.checked = weakOnly;
+weakOnlyToggle.addEventListener('change', ()=>{
+ weakOnly = weakOnlyToggle.checked;
+ try{ localStorage.setItem(WEAKONLY_KEY, weakOnly ? '1' : '0'); }catch(e){}
+});
+
+const newestFirstToggle = document.getElementById('newestFirstToggle');
+newestFirstToggle.checked = newestFirst;
+newestFirstToggle.addEventListener('change', ()=>{
+ newestFirst = newestFirstToggle.checked;
+ try{ localStorage.setItem(NEWESTFIRST_KEY, newestFirst ? '1' : '0'); }catch(e){}
+});
+
+const syncArea = document.getElementById('syncArea');
+const syncApplyBtn = document.getElementById('syncApplyBtn');
+const syncMsg = document.getElementById('syncMsg');
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+ syncArea.value = JSON.stringify(stats);
+ syncArea.style.display = 'block';
+ syncApplyBtn.style.display = 'none';
+ syncArea.focus();
+ syncArea.select();
+ syncMsg.textContent = '';
+ if(navigator.clipboard && navigator.clipboard.writeText){
+ navigator.clipboard.writeText(syncArea.value)
+ .then(()=>{ syncMsg.textContent = 'コピーしました。新しいバージョンの「進捗をインポート」に貼り付けてください。'; })
+ .catch(()=>{ syncMsg.textContent = '下のテキストを選択してコピーしてください。'; });
+ }else{
+ syncMsg.textContent = '下のテキストを選択してコピーしてください。';
+ }
+});
+
+document.getElementById('importBtn').addEventListener('click', ()=>{
+ syncArea.value = '';
+ syncArea.style.display = 'block';
+ syncApplyBtn.style.display = 'inline-block';
+ syncArea.focus();
+ syncMsg.textContent = '';
+});
+
+syncApplyBtn.addEventListener('click', ()=>{
+ try{
+ const imported = JSON.parse(syncArea.value);
+ stats = Object.assign({}, stats, imported);
+ saveStats();
+ renderTape();
+ renderWeak();
+ syncMsg.textContent = '読み込みました（' + Object.keys(imported).length + '件）。';
+ }catch(e){
+ syncMsg.textContent = '読み込みに失敗しました。JSONの形式を確認してください。';
+ }
+});
+</script>
+</body>
+</html>
