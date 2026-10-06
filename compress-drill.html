@@ -392,6 +392,9 @@ function startSession(n){
  renderCard();
 }
 
+// 字数カウント：最後の句点は最後の文字と同じマスに入れてよいので数えない
+function charCount(t){ return t.replace(/。$/,'').length; }
+
 function renderCard(){
  if(sIndex >= session.length){ renderDone(); return; }
  const item = session[sIndex];
@@ -403,14 +406,14 @@ function renderCard(){
  </div>
  <div class="qlabel">冗長な表現</div>
  <div class="qtext">${item.before}</div>
- <div class="qlen">${item.before.length}字 → もっと短く言い換えるなら？</div>
+ <div class="qlen">${charCount(item.before)}字 → もっと短く言い換えるなら？</div>
  <hr class="divider">
  <div class="answer" id="ansBlock">
  <div class="alabel">簡潔な言い換え</div>
  <div class="kw-block">
  <div class="tag">圧縮後</div>
  <div class="val">${item.after}</div>
- <div class="savings">${item.before.length}字 → ${item.after.length}字（${item.before.length - item.after.length}字圧縮）</div>
+ <div class="savings">${charCount(item.before)}字 → ${charCount(item.after)}字（${charCount(item.before) - charCount(item.after)}字圧縮）</div>
  </div>
  <div class="why-block">
  <div class="tag">圧縮のコツ</div>
